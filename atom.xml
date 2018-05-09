@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://andchen.com/"/>
-  <updated>2018-05-06T13:17:01.914Z</updated>
+  <updated>2018-05-09T12:12:21.585Z</updated>
   <id>https://andchen.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Data和Sealed</title>
+    <link href="https://andchen.com/2018/05/09/Data_Sealed/"/>
+    <id>https://andchen.com/2018/05/09/Data_Sealed/</id>
+    <published>2018-05-09T05:56:02.000Z</published>
+    <updated>2018-05-09T12:12:21.585Z</updated>
+    
+    <content type="html"><![CDATA[<p>与 Kotlin 相比，java 是一种冗长的语言。这种冗长的语言使得新程序员很容易理解Java代码。但 Java 代码却有不必要的过度膨胀。而接触过 Kotlin 的人，就会感觉它特简洁。</p><p>在写 Java 代码中，你曾有多少次是重复做同样的事：</p><img src="/2018/05/09/Data_Sealed/img1.jpg"><p>当我们编程的时候，如果有100这样的方法，看上去人也会晕，特别是出错的时候，找起来也很浪费时间。</p><p>与此相比，你看看 Kotlin,如下：</p><img src="/2018/05/09/Data_Sealed/img2.jpg"><p>看看，Kotlin 中的关键词 data 可以通过数据类根据主构造器的参数自动生成相关的代码。</p><h3 id="数据类"><a href="#数据类" class="headerlink" title="数据类"></a>数据类</h3><p>说起数据类，它有几个注意事项如下：</p><p>主构造器至少有一个参数;</p><p>主构造器的所有参数必须标记为val或var;</p><p>数据类不能是抽象类，open类，封闭（sealed）类的或内部(inner)类的。</p><p>由于数据类要求主构造器必须至少有一个参数，因此子数据中，不可以存在没有参数的主构造器，要想让数据类拥有一个没有参数的构造器。有两种方法如下：</p><p>为主构造器的每个参数都添加默认参数;</p><p>添加一个没有参数的次构造器，并调用主构造器时指定主构造器参数的默认值。</p><h3 id="封闭类"><a href="#封闭类" class="headerlink" title="封闭类"></a>封闭类</h3><p>封闭类也是 Kotlin 的一个语法糖。可以吧它理解为枚举的扩展。一个封装类，前面用 sealed 关键字标识。使用封装类的好处主要是when表达式不需要在使用else形式了。例子如下：</p><img src="/2018/05/09/Data_Sealed/img3.jpg"><p>注意：</p><p>密封类本身是抽象的，它不能被直接实例化，并且可以具有抽象成员。</p><p>密封类不允许有非私有构造函数（它们的构造函数默认是私有的）。</p><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>在 Kotlin 中提供了一些特殊类，其中数据类和封装类就是其中的两个。尽管这些类并不是必须的，但在很多时候使用它确实给我们带来很多好处，特别是数据类，当进行数据映射时将会变得得心应手。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;与 Kotlin 相比，java 是一种冗长的语言。这种冗长的语言使得新程序员很容易理解Java代码。但 Java 代码却有不必要的过度膨胀。而接触过 Kotlin 的人，就会感觉它特简洁。&lt;/p&gt;
+&lt;p&gt;在写 Java 代码中，你曾有多少次是重复做同样的事：&lt;/p&gt;
+&lt;i
+      
+    
+    </summary>
+    
+      <category term="Kotlin" scheme="https://andchen.com/categories/Kotlin/"/>
+    
+    
+      <category term="Kotlin" scheme="https://andchen.com/tags/Kotlin/"/>
+    
+  </entry>
   
   <entry>
     <title>Kotlin-类和接口</title>
