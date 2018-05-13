@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://andchen.com/"/>
-  <updated>2018-05-09T12:30:25.524Z</updated>
+  <updated>2018-05-13T03:54:29.679Z</updated>
   <id>https://andchen.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>对象和委托</title>
+    <link href="https://andchen.com/2018/05/13/Object_Delegate/"/>
+    <id>https://andchen.com/2018/05/13/Object_Delegate/</id>
+    <published>2018-05-13T01:09:04.000Z</published>
+    <updated>2018-05-13T03:54:29.679Z</updated>
+    
+    <content type="html"><![CDATA[<p>每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。</p><h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p>对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。</p><p>在 Java 中，有一个匿名类的概念，也就是在创建类时，无须指定类的名字，匿名类一般用于方法的参数类型。基本概念是方法参数需要接收一个类或者接口的实例，而这个实例只是在该方法中临时用一下，并没有必要单独定义一个类，或单独创建一个对象变量。因此，就在传入方法参数值的同时创建了类的实例。看！下面的 Java 中匿名类的使用：</p><img src="/2018/05/13/Object_Delegate/img1.jpg"><p>在 Kotlin 中，也有类似的功能，但不是匿名类，而是对象。例如，下面的 Kotlin 代码完全实现了前面 Java代码的功能。要建立一个对象，需要使用 object 关键字，该对象要继承的类需要与 object 之间用冒号(:)分隔：如 MyClass(“Tom”)。</p><img src="/2018/05/13/Object_Delegate/img2.jpg"><h3 id="委托"><a href="#委托" class="headerlink" title="委托"></a>委托</h3><p>委托其实是一种非常好的代码重用方式，有点类似 AOP (面向方面编程)，也就是将多个地方出现的代码放到同一个地方，以便被多个类属性重用。在学 kotlin 委托时，让我最深刻的就是委托属性和委托类的初始化函数。</p><h4 id="委托属性"><a href="#委托属性" class="headerlink" title="委托属性"></a>委托属性</h4><p>在实际应用中，很多类属性的 getter 和 setter 函数的代码相同或相似，当然，从技术上来说，在每个类中编写相同的代码是可行的，但这样就会造成代码的大量冗余，而且维护困难。为了解决这个问题，Kotlin 允许属性委托，也就是将属性的 getter 和 setter 函数代码放在一个我委托类中，如果在类中声明属性，只需要指定属性类。这样就可以大大减少代码的冗余也让代码更容易维护。</p><h4 id="委托类的初始化函数"><a href="#委托类的初始化函数" class="headerlink" title="委托类的初始化函数"></a>委托类的初始化函数</h4><p>在学习委托类的初始化函数的时候，让我最难理解的就是下面那句代码。</p><img src="/2018/05/13/Object_Delegate/image.png"><p>这句代码让我很困惑，特别是 Any 和 Any？，到底这两个有什么区别呢？然后我就去 Google，最后很开心，我找到了，也懂了。</p><p>原来，Kotlin 里的 Any，它相当于 Java 里的 Object，所有其他的类都默认继承了它。而Any 是非空类型层级结构的顶层，Any? 则是可空类型层级结构的顶层。因为 Any? 是 Any 的父类型，所以 Any? 是 Kotlin 类型层级结构的最顶端。例如： String 是 Any 的子类型，则 String? 是 Any? 的子类型。</p><p>而且，kotlin.Any是没有声明超类的类的默认超类。任何不是java.lang.Object，特别是它没有除equals（），hashCode（）和toString（）方法以外的任何成员。</p><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>对象和委托是 Kotlin 中两个比较大的语法糖，对象相当于 Java 中的匿名对象，而委托的主要作用是实现代码重用，有点类似 AOP (面向方面编程)。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。&lt;/p&gt;
+&lt;h3 id=&quot;对象&quot;&gt;&lt;a href=&quot;#对象&quot; class=&quot;headerlink&quot; title=&quot;对象&quot;&gt;&lt;/a&gt;对象&lt;/h3&gt;&lt;p&gt;对象是 Kotlin 中的一个重要概念，可能很多读者
+      
+    
+    </summary>
+    
+      <category term="Kotlin" scheme="https://andchen.com/categories/Kotlin/"/>
+    
+    
+      <category term="kotlin" scheme="https://andchen.com/tags/kotlin/"/>
+    
+  </entry>
   
   <entry>
     <title>Data和Sealed</title>
