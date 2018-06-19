@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://andchen.com/"/>
-  <updated>2018-05-28T14:25:38.148Z</updated>
+  <updated>2018-06-17T02:45:31.132Z</updated>
   <id>https://andchen.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>python实例</title>
+    <link href="https://andchen.com/2018/06/17/python/"/>
+    <id>https://andchen.com/2018/06/17/python/</id>
+    <published>2018-06-17T01:32:49.000Z</published>
+    <updated>2018-06-17T02:45:31.132Z</updated>
+    
+    <content type="html"><![CDATA[<p>今天遇了一个 python 试题，让我很经惊讶，我想，噫～～怎么看起来那么眼熟，这不是高中的数学题目？用 python 怎么实现呢？</p><p>看实例，如下：</p><p>题目：两个乒乓球进行比赛，各出三人。甲队为a,b,c三人，乙队为x,y,z三人。已抽签决定比赛名单。有人向队员打听比赛的名单。a说他不和x比，c说他不和x，z比，请编程序找出三队赛手的名单。</p><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i in range(<span class="keyword">ord</span>(<span class="string">'x'</span>), <span class="keyword">ord</span>(<span class="string">'z'</span>) + <span class="number">1</span>):</span><br><span class="line">    <span class="keyword">for</span> j in range(<span class="keyword">ord</span>(<span class="string">'x'</span>), <span class="keyword">ord</span>(<span class="string">'z'</span>) + <span class="number">1</span>):</span><br><span class="line">        <span class="keyword">if</span> i != j:</span><br><span class="line">            <span class="keyword">for</span> k in range(<span class="keyword">ord</span>(<span class="string">'x'</span>), <span class="keyword">ord</span>(<span class="string">'z'</span>) + <span class="number">1</span>):</span><br><span class="line">                <span class="keyword">if</span> (i != k) <span class="keyword">and</span> (j != k):</span><br><span class="line">                    <span class="keyword">if</span> (i != <span class="keyword">ord</span>(<span class="string">'x'</span>)) <span class="keyword">and</span> (k != <span class="keyword">ord</span>(<span class="string">'x'</span>)) <span class="keyword">and</span> (k != <span class="keyword">ord</span>(<span class="string">'z'</span>)):</span><br><span class="line">                        <span class="keyword">print</span>(<span class="string">'order is a -- %s\t b -- %s\tc--%s'</span> % (<span class="keyword">chr</span>(i), <span class="keyword">chr</span>(j), <span class="keyword">chr</span>(k)))</span><br></pre></td></tr></table></figure><p>我是小白，若上面的代码有错误的可以留言告诉我，我将不胜感激，谢谢！</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;今天遇了一个 python 试题，让我很经惊讶，我想，噫～～怎么看起来那么眼熟，这不是高中的数学题目？用 python 怎么实现呢？&lt;/p&gt;
+&lt;p&gt;看实例，如下：&lt;/p&gt;
+&lt;p&gt;题目：两个乒乓球进行比赛，各出三人。甲队为a,b,c三人，乙队为x,y,z三人。已抽签决定比赛名
+      
+    
+    </summary>
+    
+      <category term="python" scheme="https://andchen.com/categories/python/"/>
+    
+    
+      <category term="Python" scheme="https://andchen.com/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>不同语言的妙处--冒泡</title>
@@ -152,7 +179,7 @@
     <link href="https://andchen.com/2018/05/06/Class-Interface/"/>
     <id>https://andchen.com/2018/05/06/Class-Interface/</id>
     <published>2018-05-06T07:51:56.000Z</published>
-    <updated>2018-05-09T12:26:33.747Z</updated>
+    <updated>2018-06-17T01:54:20.232Z</updated>
     
     <content type="html"><![CDATA[<p>一个月前有一位大神，送了我一本 Kotlin 的书，当时的我，即兴奋又焦虑，原因就不说了，然而，由于各种繁忙，或者说拖延期，直到现在才开始学它，废话少说，直接转入正文。</p><p>这几天，我在学 Kotlin，首先把 Hello World 贴出吧</p><img src="/2018/05/06/Class-Interface/Hello.jpg"><p>Kotlin 和 Java 的类有点类似，就是语法糖不一样，但是实际对比一下实现同样功能的 Java 代码，差别还是很大的！</p><p>用 kotlin 类实现一个 Person 类属性的基本用法很简洁，而 Java 类实现Person却很长一串，这就是它们的区别，因此，很多程序员愿意用 Kotlin 开发APP。</p><img src="/2018/05/06/Class-Interface/J-Person.jpg"><img src="/2018/05/06/Class-Interface/Kt-Person.jpg"><p>要注意的是，Kotlin 分主构造器和第二构造器，主构造器的参数不仅可以用在 init 块中，还可以用于对属性的初始化。而第二构造器前面必须加 constructor 关键字，在类中声明了主构造器所有第二构造器都需要在声明后面调用主构造器。</p><p>特别重要的一点，注意：在主构造器参数中可以使用 var 和 val，但在第二构造器参数中不能使用 var 和 val，这就意味着，第二构造器的参数都是只读的，不能在构造器内部改变参数的值。而 Java 没有这些语法糖。</p><h2 id="修饰符-Modifiers"><a href="#修饰符-Modifiers" class="headerlink" title="修饰符(Modifiers)"></a>修饰符(Modifiers)</h2><p>在Kotlin 中，修饰符有4个：pivate protected internal 和 public。</p><p>pivate:仅仅在类的内部可以访问。</p><p>protected:类似pivate，但在子类中也可以访问。</p><p>internal:任何在模块内部类都可以访问。</p><p>public:任何类都可以访问。</p><h2 id="类的继承"><a href="#类的继承" class="headerlink" title="类的继承(:)"></a>类的继承(:)</h2><p>与Java不同，Kotlin 类的继承需要使用冒号(:),而Java用的是extends。<br>注意，冒号后面需要调用父类的构造器。Kotlin和Java一样，都是单继承的，也就是说，一个Kotlin只能有一个父类。</p><img src="/2018/05/06/Class-Interface/jc.jpg"><p>要注意的是，Kotlin默认时class是final的，也就是说，默认时class不允许继承，需要显式地使用open关键词允许继承class。</p><h2 id="接口-Interface"><a href="#接口-Interface" class="headerlink" title="接口(Interface)"></a>接口(Interface)</h2><p>Kotlin 中的接口与Java 中的接口类似，使用interface关键词声明。一个类可以实现多个接口，实现的方法和类继承相同。而且，接口中的属性和方法都是open的。</p><img src="/2018/05/06/Class-Interface/Interface.jpg"><p>注意，在Java 中不允许有方法体，不过在Kotlin 中，允许接口的方法包含默认的方法体。</p><h2 id="抽象类-abstact"><a href="#抽象类-abstact" class="headerlink" title="抽象类(abstact)"></a>抽象类(abstact)</h2><p>抽象类和接口非常类似，Kotlin接口支持默认函数体，因此就更像了。学过Java的人都知道，抽象类不能被实类化，需要使用abstact关键字声明，Kotlin也如此。</p><p>注意，抽象方法不需要使用open声明，因此抽象类本身就是可继承的。</p><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>如果从作用上来说，Kotlin 中的类和接口与Java的类和接口没什么本质上的差异，只不过Kotlin 为了体现差异，加了一些语法糖，如接口允许函数带有函数体，支持类属性，不支持静态方法等，这些语法糖的改进是否好不好，仍需要时间的验证，不过Kotlin提供这些功能，不妨我们去尝试用它，是否给我们的开发工作带来便利。</p>]]></content>
     
