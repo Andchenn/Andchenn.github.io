@@ -300,6 +300,205 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/18/Python/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Feng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序媛学习之路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/18/Python/" itemprop="url">
+                  Python爬虫--使用Beautiful Soup(4)
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-18 14:55:37 / 修改时间：16:10:24" itemprop="dateCreated datePublished" datetime="2018-07-18T14:55:37+08:00">2018-07-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。</p>
+<h2 id="什么是BeautifulSoup？"><a href="#什么是BeautifulSoup？" class="headerlink" title="什么是BeautifulSoup？"></a>什么是BeautifulSoup？</h2><p>Python的网页解析可以用正则表达式去完成，那么我们在写的时候，要挨个的去把代码拿出来匹配，而且还要写匹配的规则，整体实现起来就很复杂。BeautifulSoup呢，它是一个方便的网页解析库，处理高效，支持多种解析器。大部分情况下，利用它我们不在需要编写正则表达式就可以方便的实现网页信息的提取。</p>
+<p>BeautifulSoup是一个网页解析库，它支持很多解析器，不过最主流的有两个。一个是Python标准库，一个是lxml HTML 解析器。两者的使用方法相似：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"></span><br><span class="line"><span class="comment"># Python的标准库</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'html.parser'</span>)</span><br><span class="line"><span class="comment"># lxml</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br></pre></td></tr></table></figure>
+<p>Python内置标准库的执行速度一般，但是低版本的Python中，中文的容错能力比较差。lxmlHTML 解析器的执行速度快，但是需要安装 C语言的依赖库。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>在开始之前，请确保已经正确安装好了Beautiful Soup和lxml，如果没有安装,看下面：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install beautifulsoup4</span><br><span class="line">pip install lxml</span><br></pre></td></tr></table></figure>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p>下面首先用实例来看看Beautiful Soup的基本用法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">html = <span class="string">"""</span></span><br><span class="line"><span class="string">&lt;html&gt;&lt;head&gt;&lt;title&gt;The Dormouse's story&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br><span class="line"><span class="string">&lt;p class="title" name="dromouse"&gt;&lt;b&gt;The Dormouse's story&lt;/b&gt;&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;p class="story"&gt;Once upon a time there were three little sisters; and their names were</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/elsie" class="sister" id="link1"&gt;&lt;!-- Elsie --&gt;&lt;/a&gt;,</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/lacie" class="sister" id="link2"&gt;Lacie&lt;/a&gt; and</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/tillie" class="sister" id="link3"&gt;Tillie&lt;/a&gt;;</span></span><br><span class="line"><span class="string">and they lived at the bottom of a well.&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;p class="story"&gt;...&lt;/p&gt;</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.prettify())</span><br><span class="line">print(soup.title.string)</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line"> &lt;head&gt;</span><br><span class="line">  &lt;title&gt;</span><br><span class="line">   The Dormouse's story</span><br><span class="line">  &lt;/title&gt;</span><br><span class="line"> &lt;/head&gt;</span><br><span class="line"> &lt;body&gt;</span><br><span class="line">  &lt;p class="title" name="dromouse"&gt;</span><br><span class="line">   &lt;b&gt;</span><br><span class="line">    The Dormouse's story</span><br><span class="line">   &lt;/b&gt;</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line">  &lt;p class="story"&gt;</span><br><span class="line">   Once upon a time there were three little sisters; and their names were</span><br><span class="line">   &lt;a class="sister" href="http://example.com/elsie" id="link1"&gt;</span><br><span class="line">    &lt;!-- Elsie --&gt;</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   ,</span><br><span class="line">   &lt;a class="sister" href="http://example.com/lacie" id="link2"&gt;</span><br><span class="line">    Lacie</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   and</span><br><span class="line">   &lt;a class="sister" href="http://example.com/tillie" id="link3"&gt;</span><br><span class="line">    Tillie</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   ;</span><br><span class="line">and they lived at the bottom of a well.</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line">  &lt;p class="story"&gt;</span><br><span class="line">   ...</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line"> &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">The Dormouse's story</span><br></pre></td></tr></table></figure>
+<p>你看，我们可以通过简单调用几个属性完成文本提取，这是不是非常方便？</p>
+<h2 id="提取信息"><a href="#提取信息" class="headerlink" title="提取信息"></a>提取信息</h2><h3 id="获取名称"><a href="#获取名称" class="headerlink" title="获取名称"></a>获取名称</h3><p>可以利用name属性获取节点的名称。这里还是以上面的文本为例，选取title节点，然后调用name属性就可以得到节点名称：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printp (soup.title.name)</span><br></pre></td></tr></table></figure>
+<h3 id="获取属性"><a href="#获取属性" class="headerlink" title="获取属性"></a>获取属性</h3><p>每个节点可能有多个属性，比如id和class等，选择这个节点元素后，可以调用attrs获取所有属性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(soup.p.attrs)</span><br><span class="line">print(soup.p.attrs[<span class="string">'name'</span>])</span><br></pre></td></tr></table></figure>
+<h3 id="获取内容"><a href="#获取内容" class="headerlink" title="获取内容"></a>获取内容</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printp (soup.p.string)</span><br></pre></td></tr></table></figure>
+<h2 id="方法选择器"><a href="#方法选择器" class="headerlink" title="方法选择器"></a>方法选择器</h2><p>虽然BeautifulSoup的基本用法，标签获取，内容获取，可以解析一些 html代码。但是在遇到很多复杂的页面时，上面的方法是完全不足的，或者是很繁琐的，因为有时候有的标签会有几个属性（class、id等）。</p>
+<p>索性BeautifulSoup给我们提供了很方便的方法选择器，也就是 API 方法，这里着重介绍2个: find() 和 find_all() 。其它方法的参数和用法类似,大家举一反三吧。</p>
+<h3 id="find-all"><a href="#find-all" class="headerlink" title="find_all()"></a>find_all()</h3><p>find_all，顾名思义，就是查询所有符合条件的元素。给它传入一些属性或文本，就可以得到符合条件的元素，它的功能十分强大。</p>
+<p>它的API如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find_all(name , attrs , recursive , text , **kwargs)</span><br></pre></td></tr></table></figure>
+<h4 id="name"><a href="#name" class="headerlink" title="name()"></a>name()</h4><p>我们可以根据节点名来查询元素，示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(soup.find_all(name=<span class="string">'ul'</span>))</span><br></pre></td></tr></table></figure>
+<h4 id="attrs"><a href="#attrs" class="headerlink" title="attrs"></a>attrs</h4><p>除了根据节点名查询，我们也可以传入一些属性来查询，示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(soup.find_all(attrs=&#123;<span class="string">'name'</span>: <span class="string">'elements'</span>&#125;))</span><br></pre></td></tr></table></figure>
+<h4 id="text"><a href="#text" class="headerlink" title="text"></a>text</h4><p>text参数可用来匹配节点的文本，传入的形式可以是字符串，可以是正则表达式对象，示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line">html=<span class="string">'''</span></span><br><span class="line"><span class="string">&lt;div class="panel"&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-body"&gt;</span></span><br><span class="line"><span class="string">        &lt;a&gt;Hello, this is a link&lt;/a&gt;</span></span><br><span class="line"><span class="string">        &lt;a&gt;Hello, this is a link, too&lt;/a&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.find_all(text=re.compile(<span class="string">'link'</span>)))</span><br></pre></td></tr></table></figure>
+<h3 id="find"><a href="#find" class="headerlink" title="find()"></a>find()</h3><p>除了find_all()方法，还有find()方法，只不过后者返回的是单个元素，也就是第一个匹配的元素，而前者返回的是所有匹配的元素组成的列表。示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">html=<span class="string">'''</span></span><br><span class="line"><span class="string">&lt;div class="panel"&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-heading"&gt;</span></span><br><span class="line"><span class="string">        &lt;h4&gt;Hello&lt;/h4&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-body"&gt;</span></span><br><span class="line"><span class="string">        &lt;ul class="list" id="list-1"&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Foo&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Bar&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Jay&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;ul class="list list-small" id="list-2"&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Foo&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Bar&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.find(name=<span class="string">'ul'</span>))</span><br><span class="line">print(soup.find(class_=<span class="string">'list'</span>))</span><br></pre></td></tr></table></figure>
+<p>find_all()、find()方法完全相同，只不过查询范围不同。</p>
+<h2 id="CSS选择器"><a href="#CSS选择器" class="headerlink" title="CSS选择器"></a>CSS选择器</h2><p>Beautiful Soup还提供了另外一种选择器，那就是CSS选择器。如果对Web开发熟悉的话，那么对CSS选择器肯定也不陌生。</p>
+<h3 id="嵌套选择"><a href="#嵌套选择" class="headerlink" title="嵌套选择"></a>嵌套选择</h3><p>select()方法同样支持嵌套选择。例如，先选择所有ul节点，再遍历每个ul节点，选择其li节点，样例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> ul <span class="keyword">in</span> soup.select(<span class="string">'ul'</span>):</span><br><span class="line">    print(ul.select(<span class="string">'li'</span>))</span><br></pre></td></tr></table></figure>
+<p>运行后可以看到，这里正常输出了所有ul节点下所有li节点组成的列表。</p>
+<h3 id="获取属性-1"><a href="#获取属性-1" class="headerlink" title="获取属性"></a>获取属性</h3><p>我们知道节点类型是Tag类型，所以获取属性还可以用原来的方法。仍然是上面的HTML文本，这里尝试获取每个ul节点的id属性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> ul <span class="keyword">in</span> soup.select(<span class="string">'ul'</span>):</span><br><span class="line">    print(ul[<span class="string">'id'</span>])</span><br><span class="line">    print(ul.attrs[<span class="string">'id'</span>])</span><br></pre></td></tr></table></figure>
+<p>运行后可以看到，直接传入中括号和属性名，以及通过attrs属性获取属性值，都可以成功。</p>
+<h3 id="获取文本"><a href="#获取文本" class="headerlink" title="获取文本"></a>获取文本</h3><p>要获取文本，当然也可以用前面所讲的string属性。此外，还有一个方法，那就是get_text()，示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> li <span class="keyword">in</span> soup.select(<span class="string">'li'</span>):</span><br><span class="line">    print(<span class="string">'Get Text:'</span>, li.get_text())</span><br><span class="line">    print(<span class="string">'String:'</span>, li.string)</span><br></pre></td></tr></table></figure>
+<p>运行后可以看到，二者的效果完全一致。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>推荐使用lxml解析库，必要时使用html.parser。<br>节点选择筛选功能弱但是速度快。<br>建议使用find()或者find_all()查询匹配单个结果或者多个结果。<br>如果对CSS选择器熟悉的话，可以使用select()方法选择。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/17/Python/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1839,177 +2038,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/05/13/Object_Delegate/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Feng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="程序媛学习之路">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/13/Object_Delegate/" itemprop="url">
-                  对象和委托
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-05-13 09:09:04 / 修改时间：11:54:29" itemprop="dateCreated datePublished" datetime="2018-05-13T09:09:04+08:00">2018-05-13</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Kotlin/" itemprop="url" rel="index"><span itemprop="name">Kotlin</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。</p>
-<h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p>对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。</p>
-<p>在 Java 中，有一个匿名类的概念，也就是在创建类时，无须指定类的名字，匿名类一般用于方法的参数类型。基本概念是方法参数需要接收一个类或者接口的实例，而这个实例只是在该方法中临时用一下，并没有必要单独定义一个类，或单独创建一个对象变量。因此，就在传入方法参数值的同时创建了类的实例。看！下面的 Java 中匿名类的使用：</p>
-<img src="/2018/05/13/Object_Delegate/img1.jpg">
-<p>在 Kotlin 中，也有类似的功能，但不是匿名类，而是对象。例如，下面的 Kotlin 代码完全实现了前面 Java代码的功能。要建立一个对象，需要使用 object 关键字，该对象要继承的类需要与 object 之间用冒号(:)分隔：如 MyClass(“Tom”)。</p>
-<img src="/2018/05/13/Object_Delegate/img2.jpg">
-<h3 id="委托"><a href="#委托" class="headerlink" title="委托"></a>委托</h3><p>委托其实是一种非常好的代码重用方式，有点类似 AOP (面向方面编程)，也就是将多个地方出现的代码放到同一个地方，以便被多个类属性重用。在学 kotlin 委托时，让我最深刻的就是委托属性和委托类的初始化函数。</p>
-<h4 id="委托属性"><a href="#委托属性" class="headerlink" title="委托属性"></a>委托属性</h4><p>在实际应用中，很多类属性的 getter 和 setter 函数的代码相同或相似，当然，从技术上来说，在每个类中编写相同的代码是可行的，但这样就会造成代码的大量冗余，而且维护困难。为了解决这个问题，Kotlin 允许属性委托，也就是将属性的 getter 和 setter 函数代码放在一个我委托类中，如果在类中声明属性，只需要指定属性类。这样就可以大大减少代码的冗余也让代码更容易维护。</p>
-<h4 id="委托类的初始化函数"><a href="#委托类的初始化函数" class="headerlink" title="委托类的初始化函数"></a>委托类的初始化函数</h4><p>在学习委托类的初始化函数的时候，让我最难理解的就是下面那句代码。</p>
-<img src="/2018/05/13/Object_Delegate/image.png">
-<p>这句代码让我很困惑，特别是 Any 和 Any？，到底这两个有什么区别呢？然后我就去 Google，最后很开心，我找到了，也懂了。</p>
-<p>原来，Kotlin 里的 Any，它相当于 Java 里的 Object，所有其他的类都默认继承了它。而Any 是非空类型层级结构的顶层，Any? 则是可空类型层级结构的顶层。因为 Any? 是 Any 的父类型，所以 Any? 是 Kotlin 类型层级结构的最顶端。例如： String 是 Any 的子类型，则 String? 是 Any? 的子类型。</p>
-<p>而且，kotlin.Any是没有声明超类的类的默认超类。任何不是java.lang.Object，特别是它没有除equals（），hashCode（）和toString（）方法以外的任何成员。</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>对象和委托是 Kotlin 中两个比较大的语法糖，对象相当于 Java 中的匿名对象，而委托的主要作用是实现代码重用，有点类似 AOP (面向方面编程)。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2057,7 +2085,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-count">14</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
