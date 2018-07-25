@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本篇文章我们来研究一下怎么分析网页的Ajax请求。 我们在平时爬取网页的时候，可能都遇到过有些网页直接请求得到的 HTML 代码里面，并没有我们需要的数据，也就是我们在浏览器中看到的内容。 这就是因为这些信息是通过Ajax加载的，并且通过js渲染生成的。这个时候我们就需要分析这个网页的请求了。 什么是AjaxAjax，全称为Asynchronous JavaScript and XML，即异步的J">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python爬虫--分析Ajax请求爬取今日头条街拍美图(7)">
+<meta property="og:url" content="https://andchen.com/2018/07/25/Python/index.html">
+<meta property="og:site_name" content="程序媛学习之路">
+<meta property="og:description" content="本篇文章我们来研究一下怎么分析网页的Ajax请求。 我们在平时爬取网页的时候，可能都遇到过有些网页直接请求得到的 HTML 代码里面，并没有我们需要的数据，也就是我们在浏览器中看到的内容。 这就是因为这些信息是通过Ajax加载的，并且通过js渲染生成的。这个时候我们就需要分析这个网页的请求了。 什么是AjaxAjax，全称为Asynchronous JavaScript and XML，即异步的J">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://andchen.com/2018/07/25/Python/img1.jpg">
+<meta property="og:image" content="https://andchen.com/2018/07/25/Python/img2.jpg">
+<meta property="og:image" content="https://andchen.com/2018/07/25/Python/img3.jpg">
+<meta property="og:updated_time" content="2018-07-25T04:25:25.711Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python爬虫--分析Ajax请求爬取今日头条街拍美图(7)">
+<meta name="twitter:description" content="本篇文章我们来研究一下怎么分析网页的Ajax请求。 我们在平时爬取网页的时候，可能都遇到过有些网页直接请求得到的 HTML 代码里面，并没有我们需要的数据，也就是我们在浏览器中看到的内容。 这就是因为这些信息是通过Ajax加载的，并且通过js渲染生成的。这个时候我们就需要分析这个网页的请求了。 什么是AjaxAjax，全称为Asynchronous JavaScript and XML，即异步的J">
+<meta name="twitter:image" content="https://andchen.com/2018/07/25/Python/img1.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="程序媛学习之路" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://andchen.com/2018/07/25/Python/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Python爬虫--分析Ajax请求爬取今日头条街拍美图(7) | 程序媛学习之路</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序媛学习之路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/25/Python/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Feng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序媛学习之路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python爬虫--分析Ajax请求爬取今日头条街拍美图(7)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-25 10:48:19 / 修改时间：12:25:25" itemprop="dateCreated datePublished" datetime="2018-07-25T10:48:19+08:00">2018-07-25</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇文章我们来研究一下怎么分析网页的Ajax请求。</p>
+<p>我们在平时爬取网页的时候，可能都遇到过有些网页直接请求得到的 HTML 代码里面，并没有我们需要的数据，也就是我们在浏览器中看到的内容。</p>
+<p>这就是因为这些信息是通过Ajax加载的，并且通过js渲染生成的。这个时候我们就需要分析这个网页的请求了。</p>
+<h3 id="什么是Ajax"><a href="#什么是Ajax" class="headerlink" title="什么是Ajax"></a>什么是Ajax</h3><p>Ajax，全称为Asynchronous JavaScript and XML，即异步的JavaScript和XML。它不是一门编程语言，而是利用JavaScript在保证页面不被刷新、页面链接不改变的情况下与服务器交换数据并更新部分网页的技术。</p>
+<p>比如：拿微博来说，我们以我的个人的主页为例，切换到微博页面，一直下滑，可以发现下滑几个微博之后，再向下就没有了，转而会出现一个加载的动画，不一会儿下方就继续出现了新的微博内容，也就意味着页面的链接没有变化，但是网页中却多了新内容，也就是后面刷出来的新微博。这就是通过Ajax获取新数据并呈现的过程。</p>
+<h3 id="爬取分析"><a href="#爬取分析" class="headerlink" title="爬取分析"></a>爬取分析</h3><p>我们目标网站就以今日头条街拍美图来进行分析。</p>
+<p>在抓取之前，首先要分析抓取的逻辑。打开今日头条的首页：<a href="http://www.toutiao.com/" target="_blank" rel="noopener">地址</a> 如下：</p>
+<img src="/2018/07/25/Python/img1.jpg">
+<p>右上角有一个搜索入口，这里尝试抓取街拍美图，所以输入“街拍”二字搜索一下，如下：</p>
+<img src="/2018/07/25/Python/img2.jpg">
+<h4 id="那我们要怎么获得所有页的数据呢？"><a href="#那我们要怎么获得所有页的数据呢？" class="headerlink" title="那我们要怎么获得所有页的数据呢？"></a>那我们要怎么获得所有页的数据呢？</h4><p>我们在Chrome中打开开发者工具(F12)。我们点击Network，点击XHR标签。然后我们刷新网页，往下拉请求。这个时候我们就可以看到XHR标签，在网页每一次加载的时候就会跳出一个请求。</p>
+<p>我们点击第一个请求，可以看到它的参数：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">offset: 0</span><br><span class="line">format: json</span><br><span class="line">keyword: 街拍</span><br><span class="line">autoload: true</span><br><span class="line">count: 20</span><br></pre></td></tr></table></figure></p>
+<p>在点击第二个请求参数如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">offset: 1</span><br><span class="line">format: json</span><br><span class="line">keyword: 街拍</span><br><span class="line">autoload: true</span><br><span class="line">count: 20</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，这一个GET请求，请求URL的参数有offset、format、keyword、autoload、count和cur_tab。我们需要找出这些参数的规律，因为这样才可以方便地用程序构造出来。</p>
+<img src="/2018/07/25/Python/img3.jpg">
+<p>好了，分析到这里，如果想了解更多，你们可以进行实现一下这个过程。</p>
+<h3 id="爬取流程"><a href="#爬取流程" class="headerlink" title="爬取流程"></a>爬取流程</h3><p>分析Ajax请求获得文章的 url 信息;</p>
+<p>解析每一篇文章，获得需要的数据内容;</p>
+<p>将获取的数据保存下来;</p>
+<p>开启去多进程，大量抓取。</p>
+<h3 id="实战演练"><a href="#实战演练" class="headerlink" title="实战演练"></a>实战演练</h3><p>首先，实现方法 get_page() 来加载单个 Ajax 请求的结果。其中唯一变化的参数就是 offset，所以我们将它当作参数传递，实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> urlencode</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_page</span><span class="params">(offset)</span>:</span></span><br><span class="line">    params = &#123;</span><br><span class="line">        <span class="string">'offset'</span>: offset,</span><br><span class="line">        <span class="string">'format'</span>: <span class="string">'json'</span>,</span><br><span class="line">        <span class="string">'keyword'</span>: <span class="string">'街拍'</span>,</span><br><span class="line">        <span class="string">'autoload'</span>: <span class="string">'true'</span>,</span><br><span class="line">        <span class="string">'count'</span>: <span class="string">'20'</span>,</span><br><span class="line">        <span class="string">'cur_tab'</span>: <span class="string">'1'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">    url = <span class="string">'http://www.toutiao.com/search_content/?'</span> + urlencode(params)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        response = requests.get(url)</span><br><span class="line">        <span class="keyword">if</span> response.status_code == <span class="number">200</span>:</span><br><span class="line">            <span class="keyword">return</span> response.json()</span><br><span class="line">    <span class="keyword">except</span> requests.ConnectionError:</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br></pre></td></tr></table></figure>
+<p>这里我们用urlencode()方法构造请求的GET参数，然后用requests请求这个链接，如果返回状态码为200，则调用response的json()方法将结果转为JSON格式，然后返回。</p>
+<p>接下来，再实现一下解析方法：提取每条数据的 image_detail 字段中的每一张图片链接，将图片链接和图片所属的标题并返回，此时可以构造一个生成器。实现代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_images</span><span class="params">(json)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> json.get(<span class="string">'data'</span>):</span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> json.get(<span class="string">'data'</span>):</span><br><span class="line">            title = item.get(<span class="string">'title'</span>)</span><br><span class="line">            images = item.get(<span class="string">'image_detail'</span>)</span><br><span class="line">            <span class="keyword">for</span> image <span class="keyword">in</span> images:</span><br><span class="line">                <span class="keyword">yield</span> &#123;</span><br><span class="line">                    <span class="string">'image'</span>: image.get(<span class="string">'url'</span>),</span><br><span class="line">                    <span class="string">'title'</span>: title</span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure>
+<p>接下来，实现一个保存图片的方法save_image(),其中 item 就是前面 get_images() 方法返回的一个字典。在这里，首先根据 item 的 title 来创建文件夹，然后请求这个图片链接，获取图片的二进制数据，以二进制的形式写入文件。图片的名称可以使用其内容的MD5值，这样可以去除重复。相关代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> hashlib <span class="keyword">import</span> md5</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save_image</span><span class="params">(item)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(item.get(<span class="string">'title'</span>)):</span><br><span class="line">        os.mkdir(item.get(<span class="string">'title'</span>))</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        response = requests.get(item.get(<span class="string">'image'</span>))</span><br><span class="line">        <span class="keyword">if</span> response.status_code == <span class="number">200</span>:</span><br><span class="line">            file_path = <span class="string">'&#123;0&#125;/&#123;1&#125;.&#123;2&#125;'</span>.format(item.get(<span class="string">'title'</span>), md5(response.content).hexdigest(), <span class="string">'jpg'</span>)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(file_path):</span><br><span class="line">                <span class="keyword">with</span> open(file_path, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">                    f.write(response.content)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">'Already Downloaded'</span>, file_path)</span><br><span class="line">    <span class="keyword">except</span> requests.ConnectionError:</span><br><span class="line">        print(<span class="string">'Failed to Save Image'</span>)</span><br></pre></td></tr></table></figure>
+<p>最后，只要构造一个 offset 数组，遍历 offset，提取图片链接，并将其下载:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> multiprocessing.pool <span class="keyword">import</span> Pool</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(offset)</span>:</span></span><br><span class="line">    json = get_page(offset)</span><br><span class="line">    <span class="keyword">for</span> item <span class="keyword">in</span> get_images(json):</span><br><span class="line">        print(item)</span><br><span class="line">        save_image(item)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">GROUP_START = <span class="number">1</span></span><br><span class="line">GROUP_END = <span class="number">5</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    pool = Pool()</span><br><span class="line">    groups = ([x * <span class="number">20</span> <span class="keyword">for</span> x <span class="keyword">in</span> range(GROUP_START, GROUP_END + <span class="number">1</span>)])</span><br><span class="line">    pool.map(main, groups)</span><br><span class="line">    pool.close()</span><br><span class="line">    pool.join()</span><br></pre></td></tr></table></figure>
+<p>这里利用了多线程的线程池，调用其map()方法实现多线程下载。</p>
+<h3 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h3><p><a href="https://github.com/Andchenn/Jiepai" target="_blank" rel="noopener">here</a></p>
+<p>好了，对于一些使用Ajax加载的网页，我们就可以这么抓取了。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/23/Python/" rel="next" title="Python爬虫--帅啊，帅哥图(6)">
+                <i class="fa fa-chevron-left"></i> Python爬虫--帅啊，帅哥图(6)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Feng</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+            <div class="cc-license motion-element" itemprop="license">
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+                <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+              </a>
+            </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是Ajax"><span class="nav-number">1.</span> <span class="nav-text">什么是Ajax</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#爬取分析"><span class="nav-number">2.</span> <span class="nav-text">爬取分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#那我们要怎么获得所有页的数据呢？"><span class="nav-number">2.1.</span> <span class="nav-text">那我们要怎么获得所有页的数据呢？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#爬取流程"><span class="nav-number">3.</span> <span class="nav-text">爬取流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实战演练"><span class="nav-number">4.</span> <span class="nav-text">实战演练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完整代码"><span class="nav-number">5.</span> <span class="nav-text">完整代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Feng</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Pisces</a> v6.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.2.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.2.0"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.2.0"></script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
