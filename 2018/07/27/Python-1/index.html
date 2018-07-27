@@ -113,7 +113,7 @@
 <meta property="og:image" content="https://andchen.com/2018/07/27/Python-1/img1.jpg">
 <meta property="og:image" content="https://andchen.com/2018/07/27/Python-1/img2.jpg">
 <meta property="og:image" content="https://andchen.com/2018/07/27/Python-1/img3.jpg">
-<meta property="og:updated_time" content="2018-07-27T14:58:02.783Z">
+<meta property="og:updated_time" content="2018-07-27T15:08:57.903Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python爬虫--使用Selenium爬取淘宝商品(9)">
 <meta name="twitter:description" content="在前两章中，我们已经成功尝试分析Ajax来抓取相关数据，但是并不是所有页面都可以通过分析Ajax来完成抓取。比如，淘宝，它的整个页面数据确实也是通过Ajax获取的，但是这些Ajax接口参数比较复杂，可能会包含加密密钥等，所以如果想自己构造Ajax参数，还是比较困难的。对于这种页面，最方便快捷的抓取方法就是通过Selenium。本章中，我们就用Selenium来模拟浏览器操作，抓取淘宝的商品信息，并">
@@ -350,7 +350,7 @@
                 
               
 
-              <time title="创建时间：2018-07-27 22:15:51 / 修改时间：22:58:02" itemprop="dateCreated datePublished" datetime="2018-07-27T22:15:51+08:00">2018-07-27</time>
+              <time title="创建时间：2018-07-27 22:15:51 / 修改时间：23:08:57" itemprop="dateCreated datePublished" datetime="2018-07-27T22:15:51+08:00">2018-07-27</time>
             
 
             
@@ -410,7 +410,7 @@
 <p>上一章中，我已经陈述了 Selenium 的基本操作了，里面也有相关驱动 ChromeDriver 的安装，这里就不再赘述了。</p>
 <h2 id="页面分析"><a href="#页面分析" class="headerlink" title="页面分析"></a>页面分析</h2><p>本章的目标是爬取商品信息。下图是一个商品条目，其中包含商品的基本信息，包括商品图片、名称、价格、购买人数、店铺名称和店铺所在地，我们要做的就是将这些信息都抓取下来。</p>
 <img src="/2018/07/27/Python-1/img1.jpg">
-<p>抓取入口就是淘宝的搜索页面，这个链接可以通过直接构造参数访问。例如，如果搜索iPad，就可以直接访问<a href="https://s.taobao.com/search?q=iPad，呈现的就是第一页的搜索结果，如下：" target="_blank" rel="noopener">https://s.taobao.com/search?q=iPad，呈现的就是第一页的搜索结果，如下：</a></p>
+<p>抓取入口就是淘宝的搜索页面，这个链接可以通过直接构造参数访问。例如，如果搜索iPad，就可以直接访问<a href="https://s.taobao.com/search?q=iPad" target="_blank" rel="noopener">地址</a>，呈现的就是第一页的搜索结果，如下：</p>
 <img src="/2018/07/27/Python-1/img2.jpg">
 <p>在页面下方，有一个分页导航，其中既包括前5页的链接，也包括下一页的链接，同时还有一个输入任意页码跳转的链接，如下：</p>
 <img src="/2018/07/27/Python-1/img3.jpg">
