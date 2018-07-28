@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://andchen.com/"/>
-  <updated>2018-07-27T15:11:08.527Z</updated>
+  <updated>2018-07-28T18:04:29.731Z</updated>
   <id>https://andchen.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Python爬虫--Cookie介绍和模拟登录(10)</title>
+    <link href="https://andchen.com/2018/07/29/Python/"/>
+    <id>https://andchen.com/2018/07/29/Python/</id>
+    <published>2018-07-28T16:42:50.000Z</published>
+    <updated>2018-07-28T18:04:29.731Z</updated>
+    
+    <content type="html"><![CDATA[<p>大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。</p><h2 id="什么是Cookie"><a href="#什么是Cookie" class="headerlink" title="什么是Cookie?"></a>什么是Cookie?</h2><p>在实际情况中，很多网站的内容都是需要登录之后才能看到，如此我们就需要进行模拟登录，使用登录后的状态进行爬取。这里就需要使用到Cookie。</p><p>现在大多数的网站都是使用Cookie跟踪用户的登录状态，一旦网站验证了登录信息，就会将登录信息保存在浏览器的cookie中。网站会把这个cookie作为验证的凭据，在浏览网站的页面是返回给服务器。<br>因为cookie是保存在本地的，自然cookie就可以进行篡改和伪造，暂且不表，我们先来看看Cookie长什么样子。</p><p>我们以豆瓣为例。打开Chrome的开发者工具(F12)，点开Network，打开一个链接，在headers里面：</p><p>未登陆 Cookie</p><img src="/2018/07/29/Python/img1.jpg"><p>我们复制出来看看：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bid=MJr42Sj_6JM; gr_user_id=0a379acd-54a1-4527-90d3-176f3d56e0a3; __utmc=30149280; viewed="6025284_25909353"; _vwo_uuid_v2=D9A9DDF9129C67D489D9AB470C1E3071C|8d76f7c9fe740c712105c48d2bf28c29; ll="118295"; ps=y; push_noty_num=0; push_doumail_num=0; _pk_ref.100001.a7dd=%5B%22%22%2C%22%22%2C1532796597%2C%22https%3A%2F%2Fwww.google.com%2F%22%5D; _pk_ses.100001.a7dd=*; _ga=GA1.3.869379282.1526733191; _gid=GA1.3.667268441.1532796597; page_style="mobile"; __utma=30149280.869379282.1526733191.1531998990.1532796991.14; __utmz=30149280.1532796991.14.5.utmcsr=accounts.douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/register_success; __utmt=1; __utmv=30149280.18191; douban-profile-remind=1; __utmb=30149280.10.10.1532796991; _gat=1; _pk_id.100001.a7dd=c18e4a033368c413.1532796597.1.1532797319.1532796597.; refer_url=https://read.douban.com/ebook/48673120/?icn=index-indie-rec</span><br></pre></td></tr></table></figure><p>由一个个键值对组成。</p><p>接下来，我们以<a href="https://read.douban.com" target="_blank" rel="noopener">豆瓣</a>的一本书籍的详情页为例，讲解一下Cookie的使用。</p><p>豆瓣是一个电子书下载网站，<a href="https://read.douban.com" target="_blank" rel="noopener">地址</a></p><p>正常情况下，未登录用户是看不到下载链接的，如下：</p><p>登陆后 Cookie</p><img src="/2018/07/29/Python/img2.jpg"><p>通过未登录和登录的 Cookie 对比，是不是有所领悟了，接着说说它的用途，然后进行模拟登录演示。</p><h2 id="Cookie的用途"><a href="#Cookie的用途" class="headerlink" title="Cookie的用途"></a>Cookie的用途</h2><p>(1) 存储用户登录信息，判断用户是否登录；</p><p>(2) 保存用户浏览足迹；</p><p>Cookie是服务器在客户端存储的信息。这些信息是有服务器生成服务器解释的。</p><p>请求时，客户端需要把未超时的Cookies发送给服务器。服务器需要解析Cookies判断用户信息。</p><p>我们的浏览器会在你每次浏览网页是自动存储cookie，比如你打开清除浏览器浏览记录时，就会有cookie信息。</p><p>cookie给我们带来了很多便利，他还可以记录我们的浏览足迹，停留页面时间。比如你狂淘宝的时候，淘宝的推荐你喜欢的宝贝，就是根据你的cookie，获取你浏览过哪些商品，而生成的。</p><h2 id="模拟登录演示"><a href="#模拟登录演示" class="headerlink" title="模拟登录演示"></a>模拟登录演示</h2><p>我们还是以豆瓣为例。<a href="https://read.douban.com/ebook/54232695/" target="_blank" rel="noopener">演示网址</a> ，这个URL是我的豆瓣信息页，当然大家可以使用自己的豆瓣页做例子。如果我们直接访问它，会看到上方的登录按钮，而是我已经登录了在访问呢。就不会显示登录按钮，而是个人编辑资料一些链接。</p><p>那么，如果我们使用爬虫去访问呢。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">' Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.75 Mobile Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line">url = <span class="string">'https://read.douban.com/ebook/54232695/'</span></span><br><span class="line">r = requests.get(url, headers=headers).text</span><br><span class="line">print(r)</span><br></pre></td></tr></table></figure><p>通过打印的结果，我们可以看到，html 代码里是有登录按钮的。这就证明我们并没有登录这个页面。那么，如果我们在爬取一些需要登录账号才可以爬取数据的网站时，我们必然是要解决登录问题的。那么如何实现登录呢。</p><p>答案就是我们的Cookie了。我们在之前的文章中说过，requests库在处理Cookie时，是非常简单的。我们只需要向添加‘User-Agent’一样添加请求cookies就可以了。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'Cookie'</span>: <span class="comment"># 你登录过后的浏览器cookies,</span></span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.75 Mobile Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line">url = <span class="string">'https://read.douban.com/ebook/54232695/'</span></span><br><span class="line">r = requests.get(url, headers=headers).text</span><br><span class="line">print(r)</span><br></pre></td></tr></table></figure><p>我们再次看打印信息，就可以看到有编辑个人资料的链接了。这就说明我们已经成功登录了。看！是不是很简单呢，淡定，难的在后面呢。</p><h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>那么，如果我们要登录一些复杂的网站，比如新浪微博这种必须要登录才能获取信息的网站，使用cookie登录是肯定行不通的。因为这些网站会经常更新一些网站的算法，我们的 cookie 就会在工作一会失效，那么这些网站我们就需要向登录页 post 我们的登录信息。</p><p>这些登录信息参数一般都会存放在登录页的请求头下面的 Form Data 里面，我们只要携带这些信息 Post，就可以顺利登录。但是如果遇到验证码，那么就很麻烦了。验证码的问题一直是考验爬虫的一个门槛，这个大家自己研究。<br>获取我后面会讲。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。&lt;/p&gt;
+&lt;h2 id=&quot;什么是Cookie&quot;&gt;&lt;a href=&quot;#什么是Cookie&quot; class=&quot;headerlink&quot; title=&quot;什么是Cookie?&quot;&gt;&lt;/a&gt;什么是Cookie?&lt;/h2&gt;&lt;p&gt;
+      
+    
+    </summary>
+    
+      <category term="Python" scheme="https://andchen.com/categories/Python/"/>
+    
+    
+      <category term="Python" scheme="https://andchen.com/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>Python爬虫--使用Selenium爬取淘宝商品(9)</title>
@@ -218,22 +244,6 @@
     
     
       <category term="Python" scheme="https://andchen.com/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python</title>
-    <link href="https://andchen.com/2018/07/12/Python-1/"/>
-    <id>https://andchen.com/2018/07/12/Python-1/</id>
-    <published>2018-07-12T04:17:01.000Z</published>
-    <updated>2018-07-12T04:17:01.284Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-      <category term="Python" scheme="https://andchen.com/categories/Python/"/>
-    
     
   </entry>
   
