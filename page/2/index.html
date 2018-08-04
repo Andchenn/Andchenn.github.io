@@ -300,6 +300,177 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/12/Python/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Feng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序媛学习之路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/12/Python/" itemprop="url">
+                  Python 爬虫--基本原理(1)
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-12 12:14:52 / 修改时间：14:05:34" itemprop="dateCreated datePublished" datetime="2018-07-12T12:14:52+08:00">2018-07-12</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>大家好，我是小白，来一起学习爬虫的基本原理。</p>
+<p>这篇文章我来梳理一下爬虫的基本原理。用过 Python 的朋友都知道 Python 用来写爬虫是件很简单的事情。但是有的朋友不了解爬虫到底是什么，会想爬虫为什么设置请求头，请求体，到底要怎么去发送这个请求。当然也有的朋友使用过很多爬虫的库，解析库，写过很多爬虫案例，但是可能他们的思路脉络也不是太清晰。然而，你们的困惑我之前也有过。那么我就简单帮大家梳理一下爬虫原理。</p>
+<h2 id="什么是爬虫"><a href="#什么是爬虫" class="headerlink" title="什么是爬虫"></a>什么是爬虫</h2><p>爬虫即网络爬虫（Web Spider），又被称为网页蜘蛛，是一种按照一定的规则，自动地抓取网站信息的程序或者脚本。</p>
+<p>就如，我们在浏览器输入网址，回车，得到我们需要的网络信息。这就是浏览器请求网站的服务器，获取到网络资源。爬虫也相当于模拟浏览器发送请求，获得到HTML代码。HTML代码里通常包含了标签和文字信息，我们就从中提取到我们想要的信息。</p>
+<p>通常爬虫是从某个网站的某个页面开始，爬取这个页面的内容，找到网页中的其他链接地址，然后从这个地址爬到下一个页面，这样一直不停的爬下去，进去批量的抓取信息。那么，我们可以看出网络爬虫就是一个不停爬取网页抓取信息的程序。</p>
+<h2 id="爬虫的基本流程"><a href="#爬虫的基本流程" class="headerlink" title="爬虫的基本流程"></a>爬虫的基本流程</h2><h3 id="发送请求"><a href="#发送请求" class="headerlink" title="发送请求"></a>发送请求</h3><p>通过 HTTP 库向目标站点发送请求，即发送一个 Request,然后等待服务器响应。这个请求的过程相当于浏览客户端在浏览器地址栏输入网址：<a href="https://www.google.com，然后点击回车，向服务端发送一次请求。" target="_blank" rel="noopener">https://www.google.com，然后点击回车，向服务端发送一次请求。</a></p>
+<h3 id="响应内容"><a href="#响应内容" class="headerlink" title="响应内容"></a>响应内容</h3><p>如果服务器能正常响应，我们会得到一个 Response，Response 的内容就是你所要获取的内容，这个过程就是服务器接收客户端的请求，类型可能有HTML、Json字符串，二进制数据等类型。进过解析发送给浏览器的网页HTML文件。</p>
+<h3 id="解析内容"><a href="#解析内容" class="headerlink" title="解析内容"></a>解析内容</h3><p>如果得到的内容是 HTML，可以网页解析库进行解析，得到的是 Json，可以转为 Json 对象解析。得到二进制数据，可以做保存或者进一步处理。这些就像浏览器吧服务器端的文件获取到本地，再进行解析并展现出来。</p>
+<h3 id="保存数据"><a href="#保存数据" class="headerlink" title="保存数据"></a>保存数据</h3><p>保存的方式可以是把数据存为文本，也可以把数据保存到数据库等。</p>
+<h2 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h2><h3 id="什么是-Request？"><a href="#什么是-Request？" class="headerlink" title="什么是 Request？"></a>什么是 Request？</h3><p>浏览器发送信息给该网址所在的服务器，这个过程就是做 HTTP Request。</p>
+<h3 id="Request-中包含什么？"><a href="#Request-中包含什么？" class="headerlink" title="Request 中包含什么？"></a>Request 中包含什么？</h3><p>请求方式：请求方式的主要类型是GET，POST两种，另外还有HEAD、PUT、DELETE等。GET 请求的请求参数会显示在URL链接的后面，比如我们打开谷歌，搜索“图片”，我们会看到请求的URL链接为<a href="https://www.google.com/s?wd=图片。而" target="_blank" rel="noopener">https://www.google.com/s?wd=图片。而</a> POST 请求的请求参数会存放在Request内，并不会出现在 URL 链接的后面，比如我们登录QQ邮箱，输入用户名和密码，我们会看到浏览器开发者工具的Network页，Request请求有Form Data的键值对信息，那里就存放了我们的登录信息，有利于保护我们的账户信息安全。<br>请求 URL：URL 全称是统一资源定位符，也就是我们说的网址。比如一张图片，一个音乐文件，一个网页文档等都可以用唯一URL来确定，它包含的信息指出文件的位置以及浏览器应该怎么去处理它。<br>请求头(Request Headers)：请求头包含请求时的头部信息，如User-Agent（指定浏览器的请求头），authorization，Host，Cookies等信息。<br>请求体：请求体是请求是额外携带的数据，比如登录表单提交的登录信息数据。</p>
+<h2 id="Response"><a href="#Response" class="headerlink" title="Response"></a>Response</h2><h3 id="什么是-Response？"><a href="#什么是-Response？" class="headerlink" title="什么是 Response？"></a>什么是 Response？</h3><p>服务器收到浏览器发送的信息后，能够根据浏览器发送信息的内容，做出相应的处理，然后把信息回传给浏览器，这叫 HTTP Response。</p>
+<h3 id="Response-中包含什么？"><a href="#Response-中包含什么？" class="headerlink" title="Response 中包含什么？"></a>Response 中包含什么？</h3><p>响应状态：有多种响应状态，如200代表成功，301跳转页面，404表示找不到页面，502表示服务器错误。<br>响应头(Response Headers)：比如内容类型，内容长度，服务器信息，设置 Cookie 等。<br>响应体：响应体主要的部分，包含了请求资源的内容，比如网页 HTML 代码，图片二进制数据等。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>今天梳理了爬虫的基本流程，Request，Response，有兴趣的可以学习一下，我写得不好，请帮我指出，谢谢！</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/02/Python/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1876,7 +2047,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-count">20</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
