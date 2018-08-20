@@ -300,6 +300,205 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/17/Python/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Feng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序媛学习之路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/17/Python/" itemprop="url">
+                  Python爬虫--高级用法(3)
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-17 08:42:12 / 修改时间：10:29:34" itemprop="dateCreated datePublished" datetime="2018-07-17T08:42:12+08:00">2018-07-17</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在前一节中，我们了解了requests的基本用法，如基本的GET、POST请求以及Response对象。本节中，我们再来了解下requests的一些高级用法，如文件上传、cookie设置、代理设置等。</p>
+<h3 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">files = &#123;<span class="string">'file'</span>: open(<span class="string">'favicon.ico'</span>, <span class="string">'rb'</span>)&#125;</span><br><span class="line">r = requests.post(<span class="string">'http://httpbin.org/post'</span>, files=files)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
+<p>文件上传的操作只要我们从文件夹中把文件读取出来，并且赋值给 files 参数，就可以了，打印出源代码我们就可以看待上传文件的字节流了。</p>
+<h3 id="获取Cookie"><a href="#获取Cookie" class="headerlink" title="获取Cookie"></a>获取Cookie</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">r = requests.get(<span class="string">'http://www.baidu.com'</span>)</span><br><span class="line">print(r.cookies)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> key, value <span class="keyword">in</span> r.cookies.items():</span><br><span class="line">    print(key + <span class="string">'='</span> + value)</span><br></pre></td></tr></table></figure>
+<p>通过获取字典的键值对来查看 Cookie.</p>
+<h3 id="会话维持"><a href="#会话维持" class="headerlink" title="会话维持"></a>会话维持</h3><p>在requests中，如果直接利用get()或post()等方法的确可以做到模拟网页的请求，但是这实际上是相当于不同的会话，也就是说相当于你用了两个浏览器打开了不同的页面。</p>
+<p>有朋友可能说了，我在两次请求时设置一样的cookies不就行了？可以，但这样做起来显得很烦琐，我们有更简单的解决方法。</p>
+<p>其实解决这个问题的主要方法就是维持同一个会话，也就是相当于打开一个新的浏览器选项卡而不是新开一个浏览器。但是我又不想每次设置cookies，那该怎么办呢？这时候就有了新的利器——Session对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">s = requests.Session()</span><br><span class="line">s.get(<span class="string">'http://httpbin.org/cookies/set/number/123456789'</span>)</span><br><span class="line">r = s.get(<span class="string">'http://httpbin.org/cookies'</span>)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
+<p>所以，利用Session，可以做到模拟同一个会话而不用担心Cookies的问题。它通常用于模拟登录成功之后再进行下一步的操作。</p>
+<h3 id="SSL证书验证"><a href="#SSL证书验证" class="headerlink" title="SSL证书验证"></a>SSL证书验证</h3><p>此外，requests还提供了证书验证的功能。当发送HTTP请求的时候，它会检查SSL证书，我们可以使用verify参数控制是否检查此证书。其实如果不加verify参数的话，默认是True，会自动验证。</p>
+<p>现在我们用requests来测试一下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
+<p>运行后提示一个错误 SSLError，表示证书验证错误。所以，如果请求一个 HTTPS 站点，但是证书验证错误页面时，<br>就会报这样的错误，那么怎么避免这个错误呢？很简单，把 verify 参数设置为 False 即可。相关代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, verify=<span class="keyword">False</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
+<p>不过我们发现报了一个警告，他建议我们给它指定证书。我们可以通过忽略警告的方式来屏蔽这个警告：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> requests.packages <span class="keyword">import</span> urllib3</span><br><span class="line"> </span><br><span class="line">urllib3.disable_warnings()</span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, verify=<span class="keyword">False</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
+<p>或者通过捕捉警告到日志的方式忽略警告：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">logging.captureWarnings(<span class="keyword">True</span>)</span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, verify=<span class="keyword">False</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
+<p>当然，我们也可以指定一个本地证书用作客户端证书，这可以是单个文件（包含密钥和证书）或一个包含两个文件路径的元组：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, cert=(<span class="string">'/path/server.crt'</span>, <span class="string">'/path/key'</span>))</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
+<p>当然，上面的代码是演示实例，我们需要有crt和key文件，并且指定它们的路径。注意，本地私有证书的key必须是解密状态，加密状态的key是不支持的。当然，上面的代码是演示实例，我们需要有crt和key文件，并且指定它们的路径。注意，本地私有证书的key必须是解密状态，加密状态的key是不支持的。</p>
+<h3 id="代理设置"><a href="#代理设置" class="headerlink" title="代理设置"></a>代理设置</h3><p>对于某些网站，在测试的时候请求几次，能正常获取内容。但是一旦开始大规模爬取，对于大规模且频繁的请求，网站可能会弹出验证码，或者跳转到登录认证页面，更甚者可能会直接封禁客户端的IP，导致一定时间段内无法访问。</p>
+<p>那么，为了防止这种情况发生，我们需要设置代理来解决这个问题，这就需要用到proxies参数。可以用这样的方式设置：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">proxies = &#123;</span><br><span class="line">  <span class="string">"http"</span>: <span class="string">"http://10.10.1.10:3128"</span>,</span><br><span class="line">  <span class="string">"https"</span>: <span class="string">"http://10.10.1.10:1080"</span>,</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">requests.get(<span class="string">"https://www.taobao.com"</span>, proxies=proxies)</span><br></pre></td></tr></table></figure>
+<p>当然，直接运行这个实例可能不行，因为这个代理可能是无效的，请换成自己的有效代理试验一下。</p>
+<p>除了基本的HTTP代理外，requests还支持SOCKS协议的代理。</p>
+<p>首先，需要安装socks这个库:<br>pip3 install ‘requests[socks]’</p>
+<p>然后就可以使用SOCKS协议代理了，实例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">proxies = &#123;</span><br><span class="line">    <span class="string">'http'</span>: <span class="string">'socks5://user:password@host:port'</span>,</span><br><span class="line">    <span class="string">'https'</span>: <span class="string">'socks5://user:password@host:port'</span></span><br><span class="line">&#125;</span><br><span class="line">requests.get(<span class="string">"https://www.taobao.com"</span>, proxies=proxies)</span><br></pre></td></tr></table></figure>
+<h3 id="超时设置"><a href="#超时设置" class="headerlink" title="超时设置"></a>超时设置</h3><p>在本机网络状况不好或者服务器网络响应太慢甚至无响应时，我们可能会等待特别久的时间才可能收到响应，甚至到最后收不到响应而报错。为了防止服务器不能及时响应，应该设置一个超时时间，即超过了这个时间还没有得到响应，那就报错。这需要用到timeout参数。这个时间的计算是发出请求到服务器返回响应的时间。示例如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">"https://www.taobao.com"</span>, timeout = <span class="number">1</span>)</span><br><span class="line">print(r.status_code)</span><br></pre></td></tr></table></figure>
+<p>如果想永久等待，可以直接将timeout设置为None，或者不设置直接留空，因为默认是None。这样的话，如果服务器还在运行，但是响应特别慢，那就慢慢等吧，它永远不会返回超时错误的。其用法如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r = requests.get(<span class="string">'https://www.taobao.com'</span>, timeout=<span class="keyword">None</span>)</span><br></pre></td></tr></table></figure>
+<p>或直接不加参数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r = requests.get(<span class="string">'https://www.taobao.com'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="身份验证"><a href="#身份验证" class="headerlink" title="身份验证"></a>身份验证</h3><p>有一些网站在访问的时候需要我们输入用户名和密码，那么这种网站我们要怎样处理呢。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> requests.auth <span class="keyword">import</span> HTTPBasicAuth</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">'http://localhost:5000'</span>, auth=HTTPBasicAuth(<span class="string">'username'</span>, <span class="string">'password'</span>))</span><br><span class="line">print(r.status_code)</span><br></pre></td></tr></table></figure>
+<p>调用HTTPBasicAuth类，直接传入用户名和密码就可以了。</p>
+<h3 id="Prepared-Request"><a href="#Prepared-Request" class="headerlink" title="Prepared Request"></a>Prepared Request</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> requests <span class="keyword">import</span> Request, Session</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://httpbin.org/post'</span></span><br><span class="line">data = &#123;</span><br><span class="line">    <span class="string">'name'</span>: <span class="string">'germey'</span></span><br><span class="line">&#125;</span><br><span class="line">headers = &#123;</span><br><span class="line">     <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line">s = Session()</span><br><span class="line">r = Request(<span class="string">'POST'</span>, url, data=data, headers=headers)</span><br><span class="line">prepped = s.prepare_request(r)</span><br><span class="line">r = s.send(prepped)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
+<p>可以看到，我们达到了同样的POST请求效果。</p>
+<p>最后，今天讲解了requests的一些高级用法，这些用法在后面实战部分会经常用到，需要熟练掌握。我们共同努力吧！</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/16/Python/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1833,198 +2032,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/05/06/Class-Interface/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Feng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="程序媛学习之路">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/05/06/Class-Interface/" itemprop="url">
-                  Kotlin-类和接口
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-05-06 15:51:56" itemprop="dateCreated datePublished" datetime="2018-05-06T15:51:56+08:00">2018-05-06</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2018-06-17 09:54:20" itemprop="dateModified" datetime="2018-06-17T09:54:20+08:00">2018-06-17</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Kotlin/" itemprop="url" rel="index"><span itemprop="name">Kotlin</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>一个月前有一位大神，送了我一本 Kotlin 的书，当时的我，即兴奋又焦虑，原因就不说了，然而，由于各种繁忙，或者说拖延期，直到现在才开始学它，废话少说，直接转入正文。</p>
-<p>这几天，我在学 Kotlin，首先把 Hello World 贴出吧</p>
-<img src="/2018/05/06/Class-Interface/Hello.jpg">
-<p>Kotlin 和 Java 的类有点类似，就是语法糖不一样，但是实际对比一下实现同样功能的 Java 代码，差别还是很大的！</p>
-<p>用 kotlin 类实现一个 Person 类属性的基本用法很简洁，而 Java 类实现Person却很长一串，这就是它们的区别，因此，很多程序员愿意用 Kotlin 开发APP。</p>
-<img src="/2018/05/06/Class-Interface/J-Person.jpg">
-<img src="/2018/05/06/Class-Interface/Kt-Person.jpg">
-<p>要注意的是，Kotlin 分主构造器和第二构造器，主构造器的参数不仅可以用在 init 块中，还可以用于对属性的初始化。而第二构造器前面必须加 constructor 关键字，在类中声明了主构造器所有第二构造器都需要在声明后面调用主构造器。</p>
-<p>特别重要的一点，注意：在主构造器参数中可以使用 var 和 val，但在第二构造器参数中不能使用 var 和 val，这就意味着，第二构造器的参数都是只读的，不能在构造器内部改变参数的值。而 Java 没有这些语法糖。</p>
-<h2 id="修饰符-Modifiers"><a href="#修饰符-Modifiers" class="headerlink" title="修饰符(Modifiers)"></a>修饰符(Modifiers)</h2><p>在Kotlin 中，修饰符有4个：pivate protected internal 和 public。</p>
-<p>pivate:仅仅在类的内部可以访问。</p>
-<p>protected:类似pivate，但在子类中也可以访问。</p>
-<p>internal:任何在模块内部类都可以访问。</p>
-<p>public:任何类都可以访问。</p>
-<h2 id="类的继承"><a href="#类的继承" class="headerlink" title="类的继承(:)"></a>类的继承(:)</h2><p>与Java不同，Kotlin 类的继承需要使用冒号(:),而Java用的是extends。<br>注意，冒号后面需要调用父类的构造器。Kotlin和Java一样，都是单继承的，也就是说，一个Kotlin只能有一个父类。</p>
-<img src="/2018/05/06/Class-Interface/jc.jpg">
-<p>要注意的是，Kotlin默认时class是final的，也就是说，默认时class不允许继承，需要显式地使用open关键词允许继承class。</p>
-<h2 id="接口-Interface"><a href="#接口-Interface" class="headerlink" title="接口(Interface)"></a>接口(Interface)</h2><p>Kotlin 中的接口与Java 中的接口类似，使用interface关键词声明。一个类可以实现多个接口，实现的方法和类继承相同。而且，接口中的属性和方法都是open的。</p>
-<img src="/2018/05/06/Class-Interface/Interface.jpg">
-<p>注意，在Java 中不允许有方法体，不过在Kotlin 中，允许接口的方法包含默认的方法体。</p>
-<h2 id="抽象类-abstact"><a href="#抽象类-abstact" class="headerlink" title="抽象类(abstact)"></a>抽象类(abstact)</h2><p>抽象类和接口非常类似，Kotlin接口支持默认函数体，因此就更像了。学过Java的人都知道，抽象类不能被实类化，需要使用abstact关键字声明，Kotlin也如此。</p>
-<p>注意，抽象方法不需要使用open声明，因此抽象类本身就是可继承的。</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>如果从作用上来说，Kotlin 中的类和接口与Java的类和接口没什么本质上的差异，只不过Kotlin 为了体现差异，加了一些语法糖，如接口允许函数带有函数体，支持类属性，不支持静态方法等，这些语法糖的改进是否好不好，仍需要时间的验证，不过Kotlin提供这些功能，不妨我们去尝试用它，是否给我们的开发工作带来便利。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2072,7 +2079,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-count">22</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>

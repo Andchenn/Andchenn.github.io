@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://andchen.com/"/>
-  <updated>2018-08-13T07:22:32.879Z</updated>
+  <updated>2018-08-20T14:08:33.515Z</updated>
   <id>https://andchen.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Python爬虫--Scrapy组件的用法</title>
+    <link href="https://andchen.com/2018/08/20/Python/"/>
+    <id>https://andchen.com/2018/08/20/Python/</id>
+    <published>2018-08-20T13:28:37.000Z</published>
+    <updated>2018-08-20T14:08:33.515Z</updated>
+    
+    <content type="html"><![CDATA[<p>通过上一篇文章，我相信大家对于 Scrapy 的使用也有了初步的了解。如果说要使用 Scrapy 写一些爬虫，也并非什么难事了。那么为了能写出更加复杂的爬虫，我们在本篇文章就来了解一下 Scrapy 的组件及他们的用法。</p><h3 id="理解"><a href="#理解" class="headerlink" title="理解"></a>理解</h3><p>Scrapy 作为一个框架，整体的组件协作我们还是要做到流程清晰的。我们来看一下经典的 Scrapy 架构图：</p><img src="/2018/08/20/Python/img1.jpg"><p>我们上一篇文章写的 Scrapy 项目大致流程就是：</p><p>确定爬虫名称和要抓取的初始网站;</p><p>请求网站获得响应数据 Respond ;</p><p>解析 Respond 提取数据;</p><p>有需要跟进的url 继续循环执行第二步;</p><p>将需要的数据通过管道 Pipeline 的处理;</p><p>处理完的数据传给 Item 保存。</p><p>图中的 Scrapy Engine 就是 Scrapy 的引擎，他处于中间位置，主要负责各个组件之间的通信，数据传递。</p><p>那上图的 Spiders 就是来完成爬虫的逻辑，还有网页数据的提取。他将要请求的 url 通过 Scrapy Engine 引擎，传给 Scheduler（调度器）。</p><p>调度器接收了引擎发送来的 Requests 请求，按顺序排列整理。</p><p>由于所有的数据交流都是要通过引擎的，所以调度器是通过把处理好的 Requests 有发送给引擎，由引擎通过 Downloader Middlewares（下载中间件）发送给  Downloader（下载器）。</p><p>下载器通过下载中间件的设置来下载引擎传过来的Requests 的 url，并且将获取到的 Response 又发送给引擎（如果有下载失败的 Requests，那么下载器会在后面接着下载）。</p><p>引擎收到 Response 后，再将它发送给 Spiders，Spiders 对 Response 解析提取出需要的数据（或者还有需要继续请求的 url，会继续执行上面的循环）。</p><p>Spiders 将这些数据发送给引擎，最后引擎将这些数据发送给 Item Pipeline 进行数据处理和存储。</p><p>那么这个流程就结束了。下面我给大家吧相应组件还有 Scrapy 提供的命令行工具的文档地址整理给大家。</p><h3 id="Spiders"><a href="#Spiders" class="headerlink" title="Spiders"></a>Spiders</h3><p>我们上篇文章有用过 Spider，就是我们爬虫类的基类。Spider 它主要就是来完成爬虫的逻辑，还有网页数据的提取。它将要请求的 url 通过 Scrapy Engine 引擎，传给 Scheduler (调度器)，</p><p>对 spider 来说，爬取的循环类似下文：</p><p>以初始化 Request，并设置回调函数。当该 request 下载完毕并返回时，将生成response，并作为参数传给该回调函数。</p><p>spider 中初始的 request 是通过调用 是 start_requests()来获取的。 start_requests()读取 start_urls 中的 URL，并以 parse 为回调函数生成 Request。</p><p>在回调函数内分析返回的(网页)内容，返回 Item 对象或者 Request 或者一个包括二者的可迭代容器。返回的 Request 对象之后会经过 Scrapy 处理，下载相应的内容，并调用设置的 callback 函数(函数可相同)<br>。</p><p>在回调函数内，您可以使用 选择器(Selectors) (您也可以使用BeautifulSoup, lxml 或者您想用的任何解析器) 来分析网页内容，并根据分析的数据生成item。</p><p>最后，由spider返回的item将被存到数据库(由某些 Item Pipeline 处理)或使用 Feed exports 存入到文件中。</p><h3 id="Item-Pipeline"><a href="#Item-Pipeline" class="headerlink" title="Item Pipeline"></a>Item Pipeline</h3><p>文档地址：<a href="https://scrapy-chs.readthedocs.io/zh_CN/0.24/topics/item-pipeline.html#id1" target="_blank" rel="noopener">this</a></p><h3 id="Downloader-Middleware"><a href="#Downloader-Middleware" class="headerlink" title="Downloader Middleware"></a>Downloader Middleware</h3><p>文档地址：<a href="https://scrapy-chs.readthedocs.io/zh_CN/0.24/topics/downloader-middleware.html#downloader-middleware" target="_blank" rel="noopener">this</a></p><h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>Scrapy 功能非常强大，爬取效率高，相关扩展组件多，可配置和可扩展程度非常高，希望大家能学好它。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;通过上一篇文章，我相信大家对于 Scrapy 的使用也有了初步的了解。如果说要使用 Scrapy 写一些爬虫，也并非什么难事了。那么为了能写出更加复杂的爬虫，我们在本篇文章就来了解一下 Scrapy 的组件及他们的用法。&lt;/p&gt;
+&lt;h3 id=&quot;理解&quot;&gt;&lt;a href=&quot;#
+      
+    
+    </summary>
+    
+      <category term="Python" scheme="https://andchen.com/categories/Python/"/>
+    
+    
+      <category term="Python" scheme="https://andchen.com/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>Python爬虫--使用Scrapy框架写的小项目(12)</title>
@@ -497,33 +523,6 @@
         &lt;p&gt;与 Kotlin 相比，java 是一种冗长的语言。这种冗长的语言使得新程序员很容易理解Java代码。但 Java 代码却有不必要的过度膨胀。而接触过 Kotlin 的人，就会感觉它特简洁。&lt;/p&gt;
 &lt;p&gt;在写 Java 代码中，你曾有多少次是重复做同样的事：&lt;/p&gt;
 &lt;i
-      
-    
-    </summary>
-    
-      <category term="Kotlin" scheme="https://andchen.com/categories/Kotlin/"/>
-    
-    
-      <category term="Kotlin" scheme="https://andchen.com/tags/Kotlin/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Kotlin-类和接口</title>
-    <link href="https://andchen.com/2018/05/06/Class-Interface/"/>
-    <id>https://andchen.com/2018/05/06/Class-Interface/</id>
-    <published>2018-05-06T07:51:56.000Z</published>
-    <updated>2018-06-17T01:54:20.232Z</updated>
-    
-    <content type="html"><![CDATA[<p>一个月前有一位大神，送了我一本 Kotlin 的书，当时的我，即兴奋又焦虑，原因就不说了，然而，由于各种繁忙，或者说拖延期，直到现在才开始学它，废话少说，直接转入正文。</p><p>这几天，我在学 Kotlin，首先把 Hello World 贴出吧</p><img src="/2018/05/06/Class-Interface/Hello.jpg"><p>Kotlin 和 Java 的类有点类似，就是语法糖不一样，但是实际对比一下实现同样功能的 Java 代码，差别还是很大的！</p><p>用 kotlin 类实现一个 Person 类属性的基本用法很简洁，而 Java 类实现Person却很长一串，这就是它们的区别，因此，很多程序员愿意用 Kotlin 开发APP。</p><img src="/2018/05/06/Class-Interface/J-Person.jpg"><img src="/2018/05/06/Class-Interface/Kt-Person.jpg"><p>要注意的是，Kotlin 分主构造器和第二构造器，主构造器的参数不仅可以用在 init 块中，还可以用于对属性的初始化。而第二构造器前面必须加 constructor 关键字，在类中声明了主构造器所有第二构造器都需要在声明后面调用主构造器。</p><p>特别重要的一点，注意：在主构造器参数中可以使用 var 和 val，但在第二构造器参数中不能使用 var 和 val，这就意味着，第二构造器的参数都是只读的，不能在构造器内部改变参数的值。而 Java 没有这些语法糖。</p><h2 id="修饰符-Modifiers"><a href="#修饰符-Modifiers" class="headerlink" title="修饰符(Modifiers)"></a>修饰符(Modifiers)</h2><p>在Kotlin 中，修饰符有4个：pivate protected internal 和 public。</p><p>pivate:仅仅在类的内部可以访问。</p><p>protected:类似pivate，但在子类中也可以访问。</p><p>internal:任何在模块内部类都可以访问。</p><p>public:任何类都可以访问。</p><h2 id="类的继承"><a href="#类的继承" class="headerlink" title="类的继承(:)"></a>类的继承(:)</h2><p>与Java不同，Kotlin 类的继承需要使用冒号(:),而Java用的是extends。<br>注意，冒号后面需要调用父类的构造器。Kotlin和Java一样，都是单继承的，也就是说，一个Kotlin只能有一个父类。</p><img src="/2018/05/06/Class-Interface/jc.jpg"><p>要注意的是，Kotlin默认时class是final的，也就是说，默认时class不允许继承，需要显式地使用open关键词允许继承class。</p><h2 id="接口-Interface"><a href="#接口-Interface" class="headerlink" title="接口(Interface)"></a>接口(Interface)</h2><p>Kotlin 中的接口与Java 中的接口类似，使用interface关键词声明。一个类可以实现多个接口，实现的方法和类继承相同。而且，接口中的属性和方法都是open的。</p><img src="/2018/05/06/Class-Interface/Interface.jpg"><p>注意，在Java 中不允许有方法体，不过在Kotlin 中，允许接口的方法包含默认的方法体。</p><h2 id="抽象类-abstact"><a href="#抽象类-abstact" class="headerlink" title="抽象类(abstact)"></a>抽象类(abstact)</h2><p>抽象类和接口非常类似，Kotlin接口支持默认函数体，因此就更像了。学过Java的人都知道，抽象类不能被实类化，需要使用abstact关键字声明，Kotlin也如此。</p><p>注意，抽象方法不需要使用open声明，因此抽象类本身就是可继承的。</p><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>如果从作用上来说，Kotlin 中的类和接口与Java的类和接口没什么本质上的差异，只不过Kotlin 为了体现差异，加了一些语法糖，如接口允许函数带有函数体，支持类属性，不支持静态方法等，这些语法糖的改进是否好不好，仍需要时间的验证，不过Kotlin提供这些功能，不妨我们去尝试用它，是否给我们的开发工作带来便利。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;一个月前有一位大神，送了我一本 Kotlin 的书，当时的我，即兴奋又焦虑，原因就不说了，然而，由于各种繁忙，或者说拖延期，直到现在才开始学它，废话少说，直接转入正文。&lt;/p&gt;
-&lt;p&gt;这几天，我在学 Kotlin，首先把 Hello World 贴出吧&lt;/p&gt;
-&lt;img s
       
     
     </summary>
