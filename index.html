@@ -300,7 +300,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/08/20/Python/">
+    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/09/06/Python/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Feng">
@@ -319,8 +319,8 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/08/20/Python/" itemprop="url">
-                  Python爬虫--Scrapy组件的用法
+                <a class="post-title-link" href="/2018/09/06/Python/" itemprop="url">
+                  Python爬虫--Scrapy实战抓取新浪微博(14)
                 </a>
               
             
@@ -346,12 +346,221 @@
                 
               
 
-              <time title="创建时间：2018-08-20 21:28:37 / 修改时间：22:08:33" itemprop="dateCreated datePublished" datetime="2018-08-20T21:28:37+08:00">2018-08-20</time>
+              <time title="创建时间：2018-09-06 20:31:13 / 修改时间：22:33:18" itemprop="dateCreated datePublished" datetime="2018-09-06T20:31:13+08:00">2018-09-06</time>
             
 
             
               
 
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>前面讲解了 Scrapy 的理论知识，接下来我们以一个反爬比较强的网站新浪微博为例，来实现一下 Scrapy 的大规模爬取。</p>
+<h2 id="爬取思路"><a href="#爬取思路" class="headerlink" title="爬取思路"></a>爬取思路</h2><p>首先我们要实现用户的大规模爬取。这里采用的爬取方式是，以微博的几大V为起始点，爬取他们各自的粉丝和关注列表，然后获取粉丝和关注列表的粉丝和关注列表，以此类推，这样下去就可以实现递归爬取。如果一个用户与其他用户有社交网络上的联系，那他们的信息就会被爬取虫抓取到，这样我们就可以做到对所有用户的爬取。通过这种方式，我们可以得到用户的唯一ID，再根据ID获取每个用户发布的微博即可。</p>
+<h2 id="爬取地址"><a href="#爬取地址" class="headerlink" title="爬取地址"></a>爬取地址</h2><p><a href="https://m.weibo.cn" target="_blank" rel="noopener">here</a></p>
+<h2 id="爬取分析"><a href="#爬取分析" class="headerlink" title="爬取分析"></a>爬取分析</h2><p>我们打开开发者工具，切换到 XHR 过滤器，一直下拉关注列表，即可看到下方会出现很多 Ajax 请求，这些请求就是获取关注列表的 Ajax 请求，如下：</p>
+<img src="/2018/09/06/Python/img1.jpg">
+<p>打开第一个 Ajax 请求，如下：</p>
+<img src="/2018/09/06/Python/img2.jpg">
+<p>我们分析用户详情的 Ajax 链接，用户微博列表的 Ajax 链接，如下：</p>
+<img src="/2018/09/06/Python/img3.jpg">
+<p>此处的 uid 和 page 分别代表用户 ID 和分页页码。</p>
+<p>注意，这个 API可能随着时间的变化或者微博的改版而改变，以实测为准。</p>
+<p>我们从几大 V 开始抓取，抓取他们的粉丝，关注列表，微博信息，然后递归抓取他们的粉丝和关注列表的粉丝，关注列表，微博信息，递归抓取，最后保存微博用户的基本信息，关注和粉丝列表，发布的微博。</p>
+<p>我们选择 MongoDB 作为存储的数据库，可以更方便地存储用户的粉丝和关注列表。</p>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h3 id="新建项目"><a href="#新建项目" class="headerlink" title="新建项目"></a>新建项目</h3><p>接下来，我们用 Scrapy 来实现这个抓取过程。首先创建一个项目，命令如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject weibo</span><br></pre></td></tr></table></figure>
+<p>进入项目中，新建一个 spider，名为 weibocn，命令如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy genspider weibocn m.weibo.cn</span><br></pre></td></tr></table></figure>
+<p>我们首先修改 Spider，配置各个 Ajax 的 URL，选取几个大 V，将他们的 ID 赋值成一个列表，实现 start_requests() 方法，也就是依次抓取各个大 V de个人详情，然后 parse_user() 进行解析，如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scrapy <span class="keyword">import</span> Request, Spider</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WeiboSpider</span><span class="params">(Spider)</span>:</span></span><br><span class="line">    name = <span class="string">'weibocn'</span></span><br><span class="line"></span><br><span class="line">    allowed_domains = [<span class="string">'m.weibo.cn'</span>]</span><br><span class="line">    <span class="comment"># 用户详情API</span></span><br><span class="line">    user_url = <span class="string">'https://m.weibo.cn/api/container/getIndex?uid=&#123;uid&#125;&amp;type=uid&amp;value=&#123;uid&#125;&amp;containerid=100505&#123;uid&#125;'</span></span><br><span class="line">    <span class="comment"># 关注列表API</span></span><br><span class="line">    follow_url = <span class="string">'https://m.weibo.cn/api/container/getIndex?containerid=231051_-_followers_-_&#123;uid&#125;&amp;page=&#123;page&#125;'</span></span><br><span class="line">    <span class="comment"># 粉丝列表API</span></span><br><span class="line">    fan_url = <span class="string">'https://m.weibo.cn/api/container/getIndex?containerid=231051_-_fans_-_&#123;uid&#125;&amp;page=&#123;page&#125;'</span></span><br><span class="line">    <span class="comment"># 微博列表API</span></span><br><span class="line">    weibo_url = <span class="string">'https://m.weibo.cn/api/container/getIndex?uid=&#123;uid&#125;&amp;type=uid&amp;page=&#123;page&#125;&amp;containerid=107603&#123;uid&#125;'</span></span><br><span class="line"></span><br><span class="line">    start_users = [<span class="string">'3217179555'</span>, <span class="string">'1742566624'</span>, <span class="string">'2282991915'</span>, <span class="string">'1288739185'</span>, <span class="string">'3952070245'</span>, <span class="string">'5878659096'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> uid <span class="keyword">in</span> self.start_users:</span><br><span class="line">            <span class="keyword">yield</span> Request(self.user_url.format(uid=uid), callback=self.parse_user)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_user</span><span class="params">(self, response)</span>:</span></span><br><span class="line">        self.logger.debug(response)</span><br></pre></td></tr></table></figure>
+<h3 id="创建Item"><a href="#创建Item" class="headerlink" title="创建Item"></a>创建Item</h3><p>我们解析用户的基本信息并生成 Item，这里我们先定义几个 Item，如用户，用户关系，微博的 Item，如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scrapy <span class="keyword">import</span> Item, Field</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserItem</span><span class="params">(Item)</span>:</span></span><br><span class="line">    collection = <span class="string">'users'</span></span><br><span class="line"></span><br><span class="line">    id = Field()</span><br><span class="line">    name = Field()</span><br><span class="line">    avatar = Field()</span><br><span class="line">    cover = Field()</span><br><span class="line">    gender = Field()</span><br><span class="line">    description = Field()</span><br><span class="line">    fans_count = Field()</span><br><span class="line">    follows_count = Field()</span><br><span class="line">    weibos_count = Field()</span><br><span class="line">    verified = Field()</span><br><span class="line">    verified_reason = Field()</span><br><span class="line">    verified_type = Field()</span><br><span class="line">    follows = Field()</span><br><span class="line">    fans = Field()</span><br><span class="line">    crawled_at = Field()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserRelationItem</span><span class="params">(Item)</span>:</span></span><br><span class="line">    collection = <span class="string">'users'</span></span><br><span class="line"></span><br><span class="line">    id = Field()</span><br><span class="line">    follows = Field()</span><br><span class="line">    fans = Field()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WeiboItem</span><span class="params">(Item)</span>:</span></span><br><span class="line">    collection = <span class="string">'weibos'</span></span><br><span class="line"></span><br><span class="line">    id = Field()</span><br><span class="line">    attitudes_count = Field()</span><br><span class="line">    comments_count = Field()</span><br><span class="line">    reposts_count = Field()</span><br><span class="line">    picture = Field()</span><br><span class="line">    pictures = Field()</span><br><span class="line">    source = Field()</span><br><span class="line">    text = Field()</span><br><span class="line">    raw_text = Field()</span><br><span class="line">    thumbnail = Field()</span><br><span class="line">    user = Field()</span><br><span class="line">    created_at = Field()</span><br><span class="line">    crawled_at = Field()</span><br></pre></td></tr></table></figure>
+<h3 id="提取数据"><a href="#提取数据" class="headerlink" title="提取数据"></a>提取数据</h3><p>我们开始解析用户的基本信息，实现 parse_user()方法，如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_user</span><span class="params">(self, response)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    解析用户信息</span></span><br><span class="line"><span class="string">    :param response: Response对象</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    self.logger.debug(response)</span><br><span class="line">    result = json.loads(response.text)</span><br><span class="line">    <span class="keyword">if</span> result.get(<span class="string">'data'</span>).get(<span class="string">'userInfo'</span>):</span><br><span class="line">        user_info = result.get(<span class="string">'data'</span>).get(<span class="string">'userInfo'</span>)</span><br><span class="line">        user_item = UserItem()</span><br><span class="line">        field_map = &#123;</span><br><span class="line">            <span class="string">'id'</span>: <span class="string">'id'</span>, <span class="string">'name'</span>: <span class="string">'screen_name'</span>, <span class="string">'avatar'</span>: <span class="string">'profile_image_url'</span>, <span class="string">'cover'</span>: <span class="string">'cover_image_phone'</span>,</span><br><span class="line">            <span class="string">'gender'</span>: <span class="string">'gender'</span>, <span class="string">'description'</span>: <span class="string">'description'</span>, <span class="string">'fans_count'</span>: <span class="string">'followers_count'</span>,</span><br><span class="line">            <span class="string">'follows_count'</span>: <span class="string">'follow_count'</span>, <span class="string">'weibos_count'</span>: <span class="string">'statuses_count'</span>, <span class="string">'verified'</span>: <span class="string">'verified'</span>,</span><br><span class="line">            <span class="string">'verified_reason'</span>: <span class="string">'verified_reason'</span>, <span class="string">'verified_type'</span>: <span class="string">'verified_type'</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> field, attr <span class="keyword">in</span> field_map.items():</span><br><span class="line">            user_item[field] = user_info.get(attr)</span><br><span class="line">        <span class="keyword">yield</span> user_item</span><br><span class="line">        <span class="comment"># 关注</span></span><br><span class="line">        uid = user_info.get(<span class="string">'id'</span>)</span><br><span class="line">        <span class="keyword">yield</span> Request(self.follow_url.format(uid=uid, page=<span class="number">1</span>), callback=self.parse_follows,</span><br><span class="line">                      meta=&#123;<span class="string">'page'</span>: <span class="number">1</span>, <span class="string">'uid'</span>: uid&#125;)</span><br><span class="line">        <span class="comment"># 粉丝</span></span><br><span class="line">        <span class="keyword">yield</span> Request(self.fan_url.format(uid=uid, page=<span class="number">1</span>), callback=self.parse_fans,</span><br><span class="line">                      meta=&#123;<span class="string">'page'</span>: <span class="number">1</span>, <span class="string">'uid'</span>: uid&#125;)</span><br><span class="line">        <span class="comment"># 微博</span></span><br><span class="line">        <span class="keyword">yield</span> Request(self.weibo_url.format(uid=uid, page=<span class="number">1</span>), callback=self.parse_weibos,</span><br><span class="line">                      meta=&#123;<span class="string">'page'</span>: <span class="number">1</span>, <span class="string">'uid'</span>: uid&#125;)</span><br></pre></td></tr></table></figure>
+<p>我们还要保存用户的关注和粉丝列表。以关注列表为例，其解析方法为 parse_follows(),如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_follows</span><span class="params">(self, response)</span>:</span></span><br><span class="line">       <span class="string">"""</span></span><br><span class="line"><span class="string">       解析用户关注</span></span><br><span class="line"><span class="string">       :param response: Response对象</span></span><br><span class="line"><span class="string">       """</span></span><br><span class="line">       result = json.loads(response.text)</span><br><span class="line">       <span class="keyword">if</span> result.get(<span class="string">'ok'</span>) <span class="keyword">and</span> result.get(<span class="string">'data'</span>).get(<span class="string">'cards'</span>) <span class="keyword">and</span> len(result.get(<span class="string">'data'</span>).get(<span class="string">'cards'</span>)) <span class="keyword">and</span> \</span><br><span class="line">               result.get(<span class="string">'data'</span>).get(<span class="string">'cards'</span>)[<span class="number">-1</span>].get(</span><br><span class="line">                       <span class="string">'card_group'</span>):</span><br><span class="line">           <span class="comment"># 解析用户</span></span><br><span class="line">           follows = result.get(<span class="string">'data'</span>).get(<span class="string">'cards'</span>)[<span class="number">-1</span>].get(<span class="string">'card_group'</span>)</span><br><span class="line">           <span class="keyword">for</span> follow <span class="keyword">in</span> follows:</span><br><span class="line">               <span class="keyword">if</span> follow.get(<span class="string">'user'</span>):</span><br><span class="line">                   uid = follow.get(<span class="string">'user'</span>).get(<span class="string">'id'</span>)</span><br><span class="line">                   <span class="keyword">yield</span> Request(self.user_url.format(uid=uid), callback=self.parse_user)</span><br><span class="line"></span><br><span class="line">           uid = response.meta.get(<span class="string">'uid'</span>)</span><br><span class="line">           <span class="comment"># 关注列表</span></span><br><span class="line">           user_relation_item = UserRelationItem()</span><br><span class="line">           follows = [&#123;<span class="string">'id'</span>: follow.get(<span class="string">'user'</span>).get(<span class="string">'id'</span>), <span class="string">'name'</span>: follow.get(<span class="string">'user'</span>).get(<span class="string">'screen_name'</span>)&#125; <span class="keyword">for</span> follow <span class="keyword">in</span></span><br><span class="line">                      follows]</span><br><span class="line">           user_relation_item[<span class="string">'id'</span>] = uid</span><br><span class="line">           user_relation_item[<span class="string">'follows'</span>] = follows</span><br><span class="line">           user_relation_item[<span class="string">'fans'</span>] = []</span><br><span class="line">           <span class="keyword">yield</span> user_relation_item</span><br><span class="line">           <span class="comment"># 下一页关注</span></span><br><span class="line">           page = response.meta.get(<span class="string">'page'</span>) + <span class="number">1</span></span><br><span class="line">           <span class="keyword">yield</span> Request(self.follow_url.format(uid=uid, page=page),</span><br><span class="line">                         callback=self.parse_follows, meta=&#123;<span class="string">'page'</span>: page, <span class="string">'uid'</span>: uid&#125;)</span><br></pre></td></tr></table></figure>
+<p>抓取粉丝列表的原理和抓取关注列表原理相同，下面不再赘述。</p>
+<h3 id="数据清洗"><a href="#数据清洗" class="headerlink" title="数据清洗"></a>数据清洗</h3><p>有些微博的时间可能不是标准的时间，这里我们需要统一转化这些时间，实现一个 parse_time()方法，如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_time</span><span class="params">(self, date)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> re.match(<span class="string">'刚刚'</span>, date):</span><br><span class="line">        date = time.strftime(<span class="string">'%Y-%m-%d %H:%M'</span>, time.localtime(time.time()))</span><br><span class="line">    <span class="keyword">if</span> re.match(<span class="string">'\d+分钟前'</span>, date):</span><br><span class="line">        minute = re.match(<span class="string">'(\d+)'</span>, date).group(<span class="number">1</span>)</span><br><span class="line">        date = time.strftime(<span class="string">'%Y-%m-%d %H:%M'</span>, time.localtime(time.time() - float(minute) * <span class="number">60</span>))</span><br><span class="line">    <span class="keyword">if</span> re.match(<span class="string">'\d+小时分钟前'</span>, date):</span><br><span class="line">        hour = re.match(<span class="string">'(\d+)'</span>, date).group(<span class="number">1</span>)</span><br><span class="line">        date = time.strftime(<span class="string">'%Y-%m-%d %H:%M'</span>, time.localtime(time.time() - float(hour) * <span class="number">60</span> * <span class="number">60</span>))</span><br><span class="line">    <span class="keyword">if</span> re.match(<span class="string">'昨天.*'</span>, date):</span><br><span class="line">        date = re.match(<span class="string">'昨天(.*)'</span>, date).group(<span class="number">1</span>).strip()</span><br><span class="line">        date = time.strftime(<span class="string">'%Y-%m-%d'</span>, time.localtime() - <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span>) + <span class="string">' '</span> + date</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> re.match(<span class="string">'\d&#123;2&#125;-\d&#123;2&#125;'</span>, date):</span><br><span class="line">        date = time.strftime(<span class="string">'%Y-'</span>, time.localtime()) + date + <span class="string">' 00:00'</span></span><br><span class="line">    <span class="keyword">return</span> date</span><br></pre></td></tr></table></figure>
+<h3 id="数据存储"><a href="#数据存储" class="headerlink" title="数据存储"></a>数据存储</h3><p>数据清洗完毕之后，我们就要将数据保存到 MongoDB 数据库。如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MongoPipeline</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mongo_uri, mongo_db)</span>:</span></span><br><span class="line">        self.mongo_uri = mongo_uri</span><br><span class="line">        self.mongo_db = mongo_db</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> cls(</span><br><span class="line">            mongo_uri=crawler.settings.get(<span class="string">'MONGO_URI'</span>),</span><br><span class="line">            mongo_db=crawler.settings.get(<span class="string">'MONGO_DATABASE'</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">open_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        self.client = pymongo.MongoClient(self.mongo_uri)</span><br><span class="line">        self.db = self.client[self.mongo_db]</span><br><span class="line">        self.db[UserItem.collection].create_index([(<span class="string">'id'</span>, pymongo.ASCENDING)])</span><br><span class="line">        self.db[WeiboItem.collection].create_index([(<span class="string">'id'</span>, pymongo.ASCENDING)])</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close_spider</span><span class="params">(self, spider)</span>:</span></span><br><span class="line">        self.client.close()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_item</span><span class="params">(self, item, spider)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> isinstance(item, UserItem) <span class="keyword">or</span> isinstance(item, WeiboItem):</span><br><span class="line">            self.db[item.collection].update(&#123;<span class="string">'id'</span>: item.get(<span class="string">'id'</span>)&#125;, &#123;<span class="string">'$set'</span>: item&#125;, <span class="keyword">True</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> isinstance(item, UserRelationItem):</span><br><span class="line">            self.db[item.collection].update(</span><br><span class="line">                &#123;<span class="string">'id'</span>: item.get(<span class="string">'id'</span>)&#125;,</span><br><span class="line">                &#123;<span class="string">'$addToSet'</span>:</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="string">'follows'</span>: &#123;<span class="string">'$each'</span>: item[<span class="string">'follows'</span>]&#125;,</span><br><span class="line">                        <span class="string">'fans'</span>: &#123;<span class="string">'$each'</span>: item[<span class="string">'fans'</span>]&#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;, <span class="keyword">True</span>)</span><br><span class="line">        <span class="keyword">return</span> item</span><br></pre></td></tr></table></figure>
+<h3 id="Cookies-池对接"><a href="#Cookies-池对接" class="headerlink" title="Cookies 池对接"></a>Cookies 池对接</h3><p>新浪微博的反爬能力非常强，我们需要做一些防范反爬取的措施才可以顺利完成数据爬取。</p>
+<p>我们本地启动 Cookies 池，实现一个 Middleware，如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CookiesMiddleware</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, cookies_url)</span>:</span></span><br><span class="line">        self.logger = logging.getLogger(__name__)</span><br><span class="line">        self.cookies_url = cookies_url</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_random_cookies</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            response = requests.get(self.cookies_url)</span><br><span class="line">            <span class="keyword">if</span> response.status_code == <span class="number">200</span>:</span><br><span class="line">                cookies = json.loads(response.text)</span><br><span class="line">                <span class="keyword">return</span> cookies</span><br><span class="line">        <span class="keyword">except</span> requests.ConnectionError:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request, spider)</span>:</span></span><br><span class="line">        self.logger.debug(<span class="string">'正在获取Cookies'</span>)</span><br><span class="line">        cookies = self.get_random_cookies()</span><br><span class="line">        <span class="keyword">if</span> cookies:</span><br><span class="line">            request.cookies = cookies</span><br><span class="line">            self.logger.debug(<span class="string">'使用Cookies '</span> + json.dumps(cookies))</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler)</span>:</span></span><br><span class="line">        settings = crawler.settings</span><br><span class="line">        <span class="keyword">return</span> cls(</span><br><span class="line">            cookies_url=settings.get(<span class="string">'COOKIES_URL'</span>)</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
+<h3 id="代理池对接"><a href="#代理池对接" class="headerlink" title="代理池对接"></a>代理池对接</h3><p>微博还有一个反爬措施就是，检测到同一 IP 请求量过大时就会出现414状态吗，如果遇到这样的的情况可以切换代理。例如，在本地5555端口运行，获取随机可用代理的地址为： <a href="http：//localhost:5555/random">here</a> ,访问这个接口即可获取一个随机可用代理，实现一个 Middleware，如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxyMiddleware</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, proxy_url)</span>:</span></span><br><span class="line">        self.logger = logging.getLogger(__name__)</span><br><span class="line">        self.proxy_url = proxy_url</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_random_proxy</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            response = requests.get(self.proxy_url)</span><br><span class="line">            <span class="keyword">if</span> response.status_code == <span class="number">200</span>:</span><br><span class="line">                proxy = response.text</span><br><span class="line">                <span class="keyword">return</span> proxy</span><br><span class="line">        <span class="keyword">except</span> requests.ConnectionError:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(self, request, spider)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> request.meta.get(<span class="string">'retry_times'</span>):</span><br><span class="line">            proxy = self.get_random_proxy()</span><br><span class="line">            <span class="keyword">if</span> proxy:</span><br><span class="line">                uri = <span class="string">'https://&#123;proxy&#125;'</span>.format(proxy=proxy)</span><br><span class="line">                self.logger.debug(<span class="string">'使用代理 '</span> + proxy)</span><br><span class="line">                request.meta[<span class="string">'proxy'</span>] = uri</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span><span class="params">(cls, crawler)</span>:</span></span><br><span class="line">        settings = crawler.settings</span><br><span class="line">        <span class="keyword">return</span> cls(</span><br><span class="line">            proxy_url=settings.get(<span class="string">'PROXY_URL'</span>)</span><br><span class="line">        )</span><br></pre></td></tr></table></figure>
+<h3 id="启动Middleware"><a href="#启动Middleware" class="headerlink" title="启动Middleware"></a>启动Middleware</h3><p>我们在配置文件中启用这两个 Middleware，修改 settings.py,如下所示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">    <span class="string">'weibo.middlewares.CookiesMiddleware'</span>: <span class="number">544</span>,</span><br><span class="line">    <span class="string">'weibo.middlewares.ProxyMiddleware'</span>: <span class="number">555</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><p>到此为止，整个微博爬虫就实现完毕了，我们运行如下命令启动爬虫：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl weibocn</span><br></pre></td></tr></table></figure>
+<h3 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h3><p><a href="https://github.com/Andchenn/WeiboScrapy" target="_blank" rel="noopener">here</a></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/08/20/Python/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Feng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序媛学习之路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/20/Python/" itemprop="url">
+                  Python爬虫--Scrapy组件的用法(13)
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-08-20 21:28:37" itemprop="dateCreated datePublished" datetime="2018-08-20T21:28:37+08:00">2018-08-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-09-06 20:40:01" itemprop="dateModified" datetime="2018-09-06T20:40:01+08:00">2018-09-06</time>
               
             
           </span>
@@ -1957,205 +2166,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/07/18/Python/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Feng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="程序媛学习之路">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/07/18/Python/" itemprop="url">
-                  Python爬虫--使用Beautiful Soup(4)
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-07-18 14:55:37 / 修改时间：16:10:24" itemprop="dateCreated datePublished" datetime="2018-07-18T14:55:37+08:00">2018-07-18</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。</p>
-<h2 id="什么是BeautifulSoup？"><a href="#什么是BeautifulSoup？" class="headerlink" title="什么是BeautifulSoup？"></a>什么是BeautifulSoup？</h2><p>Python的网页解析可以用正则表达式去完成，那么我们在写的时候，要挨个的去把代码拿出来匹配，而且还要写匹配的规则，整体实现起来就很复杂。BeautifulSoup呢，它是一个方便的网页解析库，处理高效，支持多种解析器。大部分情况下，利用它我们不在需要编写正则表达式就可以方便的实现网页信息的提取。</p>
-<p>BeautifulSoup是一个网页解析库，它支持很多解析器，不过最主流的有两个。一个是Python标准库，一个是lxml HTML 解析器。两者的使用方法相似：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"></span><br><span class="line"><span class="comment"># Python的标准库</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'html.parser'</span>)</span><br><span class="line"><span class="comment"># lxml</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br></pre></td></tr></table></figure>
-<p>Python内置标准库的执行速度一般，但是低版本的Python中，中文的容错能力比较差。lxmlHTML 解析器的执行速度快，但是需要安装 C语言的依赖库。</p>
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>在开始之前，请确保已经正确安装好了Beautiful Soup和lxml，如果没有安装,看下面：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install beautifulsoup4</span><br><span class="line">pip install lxml</span><br></pre></td></tr></table></figure>
-<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p>下面首先用实例来看看Beautiful Soup的基本用法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">html = <span class="string">"""</span></span><br><span class="line"><span class="string">&lt;html&gt;&lt;head&gt;&lt;title&gt;The Dormouse's story&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br><span class="line"><span class="string">&lt;p class="title" name="dromouse"&gt;&lt;b&gt;The Dormouse's story&lt;/b&gt;&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;p class="story"&gt;Once upon a time there were three little sisters; and their names were</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/elsie" class="sister" id="link1"&gt;&lt;!-- Elsie --&gt;&lt;/a&gt;,</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/lacie" class="sister" id="link2"&gt;Lacie&lt;/a&gt; and</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/tillie" class="sister" id="link3"&gt;Tillie&lt;/a&gt;;</span></span><br><span class="line"><span class="string">and they lived at the bottom of a well.&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;p class="story"&gt;...&lt;/p&gt;</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.prettify())</span><br><span class="line">print(soup.title.string)</span><br></pre></td></tr></table></figure>
-<p>运行结果如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line"> &lt;head&gt;</span><br><span class="line">  &lt;title&gt;</span><br><span class="line">   The Dormouse's story</span><br><span class="line">  &lt;/title&gt;</span><br><span class="line"> &lt;/head&gt;</span><br><span class="line"> &lt;body&gt;</span><br><span class="line">  &lt;p class="title" name="dromouse"&gt;</span><br><span class="line">   &lt;b&gt;</span><br><span class="line">    The Dormouse's story</span><br><span class="line">   &lt;/b&gt;</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line">  &lt;p class="story"&gt;</span><br><span class="line">   Once upon a time there were three little sisters; and their names were</span><br><span class="line">   &lt;a class="sister" href="http://example.com/elsie" id="link1"&gt;</span><br><span class="line">    &lt;!-- Elsie --&gt;</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   ,</span><br><span class="line">   &lt;a class="sister" href="http://example.com/lacie" id="link2"&gt;</span><br><span class="line">    Lacie</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   and</span><br><span class="line">   &lt;a class="sister" href="http://example.com/tillie" id="link3"&gt;</span><br><span class="line">    Tillie</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   ;</span><br><span class="line">and they lived at the bottom of a well.</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line">  &lt;p class="story"&gt;</span><br><span class="line">   ...</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line"> &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">The Dormouse's story</span><br></pre></td></tr></table></figure>
-<p>你看，我们可以通过简单调用几个属性完成文本提取，这是不是非常方便？</p>
-<h2 id="提取信息"><a href="#提取信息" class="headerlink" title="提取信息"></a>提取信息</h2><h3 id="获取名称"><a href="#获取名称" class="headerlink" title="获取名称"></a>获取名称</h3><p>可以利用name属性获取节点的名称。这里还是以上面的文本为例，选取title节点，然后调用name属性就可以得到节点名称：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printp (soup.title.name)</span><br></pre></td></tr></table></figure>
-<h3 id="获取属性"><a href="#获取属性" class="headerlink" title="获取属性"></a>获取属性</h3><p>每个节点可能有多个属性，比如id和class等，选择这个节点元素后，可以调用attrs获取所有属性：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(soup.p.attrs)</span><br><span class="line">print(soup.p.attrs[<span class="string">'name'</span>])</span><br></pre></td></tr></table></figure>
-<h3 id="获取内容"><a href="#获取内容" class="headerlink" title="获取内容"></a>获取内容</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printp (soup.p.string)</span><br></pre></td></tr></table></figure>
-<h2 id="方法选择器"><a href="#方法选择器" class="headerlink" title="方法选择器"></a>方法选择器</h2><p>虽然BeautifulSoup的基本用法，标签获取，内容获取，可以解析一些 html代码。但是在遇到很多复杂的页面时，上面的方法是完全不足的，或者是很繁琐的，因为有时候有的标签会有几个属性（class、id等）。</p>
-<p>索性BeautifulSoup给我们提供了很方便的方法选择器，也就是 API 方法，这里着重介绍2个: find() 和 find_all() 。其它方法的参数和用法类似,大家举一反三吧。</p>
-<h3 id="find-all"><a href="#find-all" class="headerlink" title="find_all()"></a>find_all()</h3><p>find_all，顾名思义，就是查询所有符合条件的元素。给它传入一些属性或文本，就可以得到符合条件的元素，它的功能十分强大。</p>
-<p>它的API如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find_all(name , attrs , recursive , text , **kwargs)</span><br></pre></td></tr></table></figure>
-<h4 id="name"><a href="#name" class="headerlink" title="name()"></a>name()</h4><p>我们可以根据节点名来查询元素，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(soup.find_all(name=<span class="string">'ul'</span>))</span><br></pre></td></tr></table></figure>
-<h4 id="attrs"><a href="#attrs" class="headerlink" title="attrs"></a>attrs</h4><p>除了根据节点名查询，我们也可以传入一些属性来查询，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(soup.find_all(attrs=&#123;<span class="string">'name'</span>: <span class="string">'elements'</span>&#125;))</span><br></pre></td></tr></table></figure>
-<h4 id="text"><a href="#text" class="headerlink" title="text"></a>text</h4><p>text参数可用来匹配节点的文本，传入的形式可以是字符串，可以是正则表达式对象，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line">html=<span class="string">'''</span></span><br><span class="line"><span class="string">&lt;div class="panel"&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-body"&gt;</span></span><br><span class="line"><span class="string">        &lt;a&gt;Hello, this is a link&lt;/a&gt;</span></span><br><span class="line"><span class="string">        &lt;a&gt;Hello, this is a link, too&lt;/a&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.find_all(text=re.compile(<span class="string">'link'</span>)))</span><br></pre></td></tr></table></figure>
-<h3 id="find"><a href="#find" class="headerlink" title="find()"></a>find()</h3><p>除了find_all()方法，还有find()方法，只不过后者返回的是单个元素，也就是第一个匹配的元素，而前者返回的是所有匹配的元素组成的列表。示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">html=<span class="string">'''</span></span><br><span class="line"><span class="string">&lt;div class="panel"&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-heading"&gt;</span></span><br><span class="line"><span class="string">        &lt;h4&gt;Hello&lt;/h4&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-body"&gt;</span></span><br><span class="line"><span class="string">        &lt;ul class="list" id="list-1"&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Foo&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Bar&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Jay&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;ul class="list list-small" id="list-2"&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Foo&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Bar&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.find(name=<span class="string">'ul'</span>))</span><br><span class="line">print(soup.find(class_=<span class="string">'list'</span>))</span><br></pre></td></tr></table></figure>
-<p>find_all()、find()方法完全相同，只不过查询范围不同。</p>
-<h2 id="CSS选择器"><a href="#CSS选择器" class="headerlink" title="CSS选择器"></a>CSS选择器</h2><p>Beautiful Soup还提供了另外一种选择器，那就是CSS选择器。如果对Web开发熟悉的话，那么对CSS选择器肯定也不陌生。</p>
-<h3 id="嵌套选择"><a href="#嵌套选择" class="headerlink" title="嵌套选择"></a>嵌套选择</h3><p>select()方法同样支持嵌套选择。例如，先选择所有ul节点，再遍历每个ul节点，选择其li节点，样例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> ul <span class="keyword">in</span> soup.select(<span class="string">'ul'</span>):</span><br><span class="line">    print(ul.select(<span class="string">'li'</span>))</span><br></pre></td></tr></table></figure>
-<p>运行后可以看到，这里正常输出了所有ul节点下所有li节点组成的列表。</p>
-<h3 id="获取属性-1"><a href="#获取属性-1" class="headerlink" title="获取属性"></a>获取属性</h3><p>我们知道节点类型是Tag类型，所以获取属性还可以用原来的方法。仍然是上面的HTML文本，这里尝试获取每个ul节点的id属性：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> ul <span class="keyword">in</span> soup.select(<span class="string">'ul'</span>):</span><br><span class="line">    print(ul[<span class="string">'id'</span>])</span><br><span class="line">    print(ul.attrs[<span class="string">'id'</span>])</span><br></pre></td></tr></table></figure>
-<p>运行后可以看到，直接传入中括号和属性名，以及通过attrs属性获取属性值，都可以成功。</p>
-<h3 id="获取文本"><a href="#获取文本" class="headerlink" title="获取文本"></a>获取文本</h3><p>要获取文本，当然也可以用前面所讲的string属性。此外，还有一个方法，那就是get_text()，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> li <span class="keyword">in</span> soup.select(<span class="string">'li'</span>):</span><br><span class="line">    print(<span class="string">'Get Text:'</span>, li.get_text())</span><br><span class="line">    print(<span class="string">'String:'</span>, li.string)</span><br></pre></td></tr></table></figure>
-<p>运行后可以看到，二者的效果完全一致。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>推荐使用lxml解析库，必要时使用html.parser。<br>节点选择筛选功能弱但是速度快。<br>建议使用find()或者find_all()查询匹配单个结果或者多个结果。<br>如果对CSS选择器熟悉的话，可以使用select()方法选择。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2203,7 +2213,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-count">23</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
