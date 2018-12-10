@@ -406,7 +406,7 @@
 <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>在开始之前，请确保已经安装好了 requests 库。如果没有安装，安装也很简单：pip install requests</p>
 <h2 id="语法基础"><a href="#语法基础" class="headerlink" title="语法基础"></a>语法基础</h2><h3 id="实例引入"><a href="#实例引入" class="headerlink" title="实例引入"></a>实例引入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">'https://www.baidu.com/'</span>)</span><br><span class="line">print(r.status_code)</span><br><span class="line">print(type(r.text))</span><br><span class="line">print(r.text)</span><br><span class="line">print(r.cookies)</span><br></pre></td></tr></table></figure>
 <p>运行结果：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">200</span><br><span class="line">&lt;class 'str'&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> ...HTML网页源码...</span><br><span class="line">&lt;RequestsCookieJar[]&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">200</span><br><span class="line">&lt;class 'str'&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> ...HTML网页源码...</span></span><br><span class="line">&lt;RequestsCookieJar[]&gt;</span><br></pre></td></tr></table></figure>
 <p>通过运行结果可以发现，我们很方便就获取到了Cookies.</p>
 <h3 id="各种请求类型"><a href="#各种请求类型" class="headerlink" title="各种请求类型"></a>各种请求类型</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">r = requests.post(<span class="string">'http://httpbin.org/post'</span>)</span><br><span class="line">r = requests.put(<span class="string">'http://httpbin.org/put'</span>)</span><br><span class="line">r = requests.delete(<span class="string">'http://httpbin.org/delete'</span>)</span><br><span class="line">r = requests.head(<span class="string">'http://httpbin.org/get'</span>)</span><br><span class="line">r = requests.options(<span class="string">'http://httpbin.org/get'</span>)</span><br></pre></td></tr></table></figure>
 <p>这里分别用post()、put()、delete()等方法实现了POST、PUT、DELETE等请求。其实这只是冰山一角，更多的还在后面。</p>
@@ -555,7 +555,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-count">25</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -580,7 +580,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">6</span>
+                      
+                    
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -605,7 +607,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">6</span>
+                      
+                    
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
