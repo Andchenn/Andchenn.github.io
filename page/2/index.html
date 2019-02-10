@@ -363,7 +363,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-07-25 12:27:46" itemprop="dateModified" datetime="2018-07-25T12:27:46+08:00">2018-07-25</time>
+                <time title="修改时间：2019-02-06 01:00:15" itemprop="dateModified" datetime="2019-02-06T01:00:15+08:00">2019-02-06</time>
               
             
           </span>
@@ -415,24 +415,14 @@
 
       
         
-          
-            <p>上一篇文章中我们抓取了实例的数据，如果大家运行成功，并且看到文件夹下的 txt 文件了。是不是很欣喜。和上一篇实践不同，我们这次来爬取 <a href="http://www.shuaia.net&quot;Markdown&quot;" target="_blank" rel="noopener">帅啊</a> 全站帅哥图，并且保存指定文件夹下。</p>
-<h3 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h3><p>通过上一篇文章的爬取过程，我们基本上理解了抓取一个网站的大致流程。因为一个网站虽然有很多页，但是大部分网站每一页的HTML标签内容都是相同的。我们只要获取到一页的内容，就可以获得所有页的内容了。那么开始吧。</p>
-<p>我们先获得源码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://www.shuaia.net/index.html'</span> </span><br><span class="line">headers = &#123;</span><br><span class="line">            <span class="string">"User-Agent"</span>: <span class="string">"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "</span><span class="string">"Chrome/58.0.3029.110 Safari/537.36 "</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">r = requests.get(url=url, headers=headers)</span><br><span class="line">r.encoding = <span class="string">'utf-8'</span></span><br><span class="line">html = r.text   </span><br><span class="line">bf = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br></pre></td></tr></table></figure>
-<p>通过URL，得到所需的页数：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> num <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">3</span>):</span><br><span class="line">    <span class="keyword">if</span> num == <span class="number">1</span>:</span><br><span class="line">        url = <span class="string">'http://www.shuaia.net/index.html'</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        url = <span class="string">'http://www.shuaia.net/index_%d.html'</span> % num</span><br></pre></td></tr></table></figure>
-<p> 得到页数后，我们利用循环就可以得到所需页的内容了：</p>
- <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> each <span class="keyword">in</span> targets_url:</span><br><span class="line">    list_url.append(each.img.get(<span class="string">'alt'</span>) + <span class="string">'='</span> + each.get(<span class="string">'href'</span>))</span><br></pre></td></tr></table></figure>
-<p>我们通过循环下载图片：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> each_img <span class="keyword">in</span> list_url:</span><br><span class="line">   img_info = each_img.split(<span class="string">'='</span>)</span><br><span class="line">   targets_url = img_info[<span class="number">1</span>]</span><br><span class="line">   filename = img_info[<span class="number">0</span>] + <span class="string">'.jpg'</span></span><br><span class="line">   print(<span class="string">'下载：'</span> + filename)</span><br></pre></td></tr></table></figure>
-<p>好了，爬虫程序到这里基本上已经全部实现了。我们创建一个 images 文件夹之前，先判断文件夹是否存在，然后存放在代码所在的文件中，这里需要用的Python内置的os库了，不清楚的伙伴可以自己查看资料哈。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="string">'images'</span> <span class="keyword">not</span> <span class="keyword">in</span> os.listdir():</span><br><span class="line">    os.makedirs(<span class="string">'images'</span>)</span><br><span class="line">    urlretrieve(url=img_url,filename=<span class="string">'images/'</span> + filename)</span><br></pre></td></tr></table></figure>
-<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>好了，最后上一下完整代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests, json, time, os</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">from</span> urllib.request <span class="keyword">import</span> urlretrieve</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    list_url = []</span><br><span class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">3</span>):</span><br><span class="line">        <span class="keyword">if</span> num == <span class="number">1</span>:</span><br><span class="line">            url = <span class="string">'http://www.shuaia.net/index.html'</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            url = <span class="string">'http://www.shuaia.net/index_%d.html'</span> % num</span><br><span class="line">        headers = &#123;</span><br><span class="line">            <span class="string">"User-Agent"</span>: <span class="string">"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "</span><span class="string">"Chrome/58.0.3029.110 Safari/537.36 "</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        r = requests.get(url=url, headers=headers)</span><br><span class="line">        r.encoding = <span class="string">'utf-8'</span></span><br><span class="line">        html = r.text</span><br><span class="line">        bf = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">        targets_url = bf.find_all(class_=<span class="string">'item-img'</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> each <span class="keyword">in</span> targets_url:</span><br><span class="line">            list_url.append(each.img.get(<span class="string">'alt'</span>) + <span class="string">'='</span> + each.get(<span class="string">'href'</span>))</span><br><span class="line">    print(<span class="string">'连接采集完成'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> each_img <span class="keyword">in</span> list_url:</span><br><span class="line">        img_info = each_img.split(<span class="string">'='</span>)</span><br><span class="line">        targets_url = img_info[<span class="number">1</span>]</span><br><span class="line">        filename = img_info[<span class="number">0</span>] + <span class="string">'.jpg'</span></span><br><span class="line">        print(<span class="string">'下载：'</span> + filename)</span><br><span class="line">        headers = &#123;</span><br><span class="line">            <span class="string">"User-Agent"</span>: <span class="string">"Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "</span></span><br><span class="line">                          <span class="string">"Chrome/58.0.3029.110 Safari/537.36 "</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        img_req = requests.get(url=targets_url, headers=headers)</span><br><span class="line">        img_req.encoding = <span class="string">'utf-8'</span></span><br><span class="line">        img_html = img_req.text</span><br><span class="line">        img_bf_1 = BeautifulSoup(img_html, <span class="string">'lxml'</span>)</span><br><span class="line">        img_url = img_bf_1.find_all(<span class="string">'div'</span>, class_=<span class="string">'wr-single-content-list'</span>)</span><br><span class="line">        img_bf_2 = BeautifulSoup(str(img_url), <span class="string">'lxml'</span>)</span><br><span class="line">        img_url = <span class="string">'http://www.shuaia.net'</span> + img_bf_2.div.img.get(<span class="string">'src'</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'images'</span> <span class="keyword">not</span> <span class="keyword">in</span> os.listdir():</span><br><span class="line">            os.makedirs(<span class="string">'images'</span>)</span><br><span class="line">        urlretrieve(url=img_url, filename=<span class="string">'images/'</span> + filename)</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    print(<span class="string">'下载完成！'</span>)</span><br></pre></td></tr></table></figure>
-<p>最后，我们就相互鼓励一下，加油！</p>
-
-          
+          <p>上一篇文章中我们抓取了实例的数据，如果大家运行成功，并且看到文件夹下的 txt 文件了。是不是很欣喜。和上一篇实践不同，我们这次来爬取 <a href="http://www.shuaia.net&quot;Markdown&quot;" target="_blank" rel="noopener">帅啊</a> 全站帅哥图，并且保存指定文件夹下。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/23/Python/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -530,12 +520,24 @@
                 
               
 
-              <time title="创建时间：2018-07-19 15:35:26 / 修改时间：16:04:54" itemprop="dateCreated datePublished" datetime="2018-07-19T15:35:26+08:00">2018-07-19</time>
+              <time title="创建时间：2018-07-19 15:35:26" itemprop="dateCreated datePublished" datetime="2018-07-19T15:35:26+08:00">2018-07-19</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 01:00:03" itemprop="dateModified" datetime="2019-02-06T01:00:03+08:00">2019-02-06</time>
               
             
           </span>
@@ -587,17 +589,14 @@
 
       
         
-          
-            <p>今天，我贴出两种方式实战内容，一个运用正则表达式，另一个运用 BeautifulSoup 来写的，之前没有过多介绍正则表达式的用法，今天看一下实例，了解一下。而我推荐大家用 BeautifulSoup 来爬取数据。毕竟每个人的兴趣不一，或许还有其他方法，看你个人喜欢用哪种爬虫，就用哪种吧！我个人喜欢用 BeautifulSoup 强大的解析工具爬虫。</p>
-<h3 id="实例一"><a href="#实例一" class="headerlink" title="实例一"></a>实例一</h3><p>运用正则表达式进行抓取数据，看下面：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> requests.exceptions <span class="keyword">import</span> RequestException</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_one_page</span><span class="params">(url)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        headers = &#123;</span><br><span class="line">            <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) '</span></span><br><span class="line">                          <span class="string">'Chrome/65.0.3325.162 Safari/537.36 '</span></span><br><span class="line">        &#125;</span><br><span class="line">        response = requests.get(url, headers=headers)</span><br><span class="line">        <span class="keyword">if</span> response.status_code == <span class="number">200</span>:</span><br><span class="line">            <span class="keyword">return</span> response.text</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">except</span> RequestException:</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_one_page</span><span class="params">(html)</span>:</span></span><br><span class="line">    pattern = re.compile(<span class="string">'&lt;dd&gt;.*?board-index.*?&gt;(\d+)&lt;/i&gt;.*?data-src="(.*?)".*?name"&gt;&lt;a'</span></span><br><span class="line">                         + <span class="string">'.*?&gt;(.*?)&lt;/a&gt;.*?star"&gt;(.*?)&lt;/p&gt;.*?releasetime"&gt;(.*?)&lt;/p&gt;'</span></span><br><span class="line">                         + <span class="string">'.*?integer"&gt;(.*?)&lt;/i&gt;.*?fraction"&gt;(.*?)&lt;/i&gt;.*?&lt;/dd&gt;'</span>, re.S)</span><br><span class="line">    items = re.findall(pattern, html)</span><br><span class="line">    <span class="keyword">for</span> item <span class="keyword">in</span> items:</span><br><span class="line">        <span class="keyword">yield</span> &#123;</span><br><span class="line">            <span class="string">'index'</span>: item[<span class="number">0</span>],</span><br><span class="line">            <span class="string">'image'</span>: item[<span class="number">1</span>],</span><br><span class="line">            <span class="string">'title'</span>: item[<span class="number">2</span>],</span><br><span class="line">            <span class="string">'actor'</span>: item[<span class="number">3</span>].strip()[<span class="number">3</span>:],</span><br><span class="line">            <span class="string">'time'</span>: item[<span class="number">4</span>].strip()[<span class="number">5</span>:],</span><br><span class="line">            <span class="string">'score'</span>: item[<span class="number">5</span>] + item[<span class="number">6</span>]</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">write_to_file</span><span class="params">(content)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'result.txt'</span>, <span class="string">'a'</span>, encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(json.dumps(content, ensure_ascii=<span class="keyword">False</span>) + <span class="string">'\n'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">(offset)</span>:</span></span><br><span class="line">    url = <span class="string">'http://maoyan.com/board/4?offset='</span> + str(offset)</span><br><span class="line">    html = get_one_page(url)</span><br><span class="line">    <span class="keyword">for</span> item <span class="keyword">in</span> parse_one_page(html):</span><br><span class="line">        print(item)</span><br><span class="line">        write_to_file(item)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        main(offset=i * <span class="number">10</span>)</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-<p>我们通过爬取猫眼TOP100的电影信息练习了正则表达式的用法。详细就不多说，想知道更多就 google 吧。</p>
-<h3 id="实例二"><a href="#实例二" class="headerlink" title="实例二"></a>实例二</h3><p>运用 BeautifulSoup 强大解析工具来抓取数据，看下面：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 请求获得HTML源码的函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_html</span><span class="params">(url)</span>:</span></span><br><span class="line">    <span class="comment"># 伪装成浏览器访问服务器</span></span><br><span class="line">    headers = &#123;<span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '</span></span><br><span class="line">                             <span class="string">'Chrome/58.0.3029.110 Safari/537.36'</span>&#125;</span><br><span class="line">    r = requests.get(url, headers=headers).text</span><br><span class="line">    <span class="keyword">return</span> r</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析页面，获得数据信息</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">html_parse</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 调用函数，for循环迭代出所有页面</span></span><br><span class="line">    <span class="keyword">for</span> url <span class="keyword">in</span> all_page():</span><br><span class="line">        <span class="comment"># BeautifulSoup的解析</span></span><br><span class="line">        soup = BeautifulSoup(get_html(url), <span class="string">'lxml'</span>)</span><br><span class="line">        <span class="comment"># 书名</span></span><br><span class="line">        alldiv = soup.find_all(<span class="string">'div'</span>, class_=<span class="string">'pl2'</span>)</span><br><span class="line">        names = [a.find(<span class="string">'a'</span>)[<span class="string">'title'</span>] <span class="keyword">for</span> a <span class="keyword">in</span> alldiv]</span><br><span class="line">        <span class="comment"># 作者</span></span><br><span class="line">        allp = soup.find_all(<span class="string">'p'</span>, class_=<span class="string">'pl'</span>)</span><br><span class="line">        authors = [p.get_text() <span class="keyword">for</span> p <span class="keyword">in</span> allp]</span><br><span class="line">        <span class="comment"># 评分</span></span><br><span class="line">        starspan = soup.find_all(<span class="string">'span'</span>, class_=<span class="string">'rating_nums'</span>)</span><br><span class="line">        scores = [s.get_text() <span class="keyword">for</span> s <span class="keyword">in</span> starspan]</span><br><span class="line">        <span class="comment"># 简介</span></span><br><span class="line">        sum_div = soup.select(<span class="string">'tr.item &gt; td:nth-of-type(2)'</span>)</span><br><span class="line">        sums = []</span><br><span class="line">        <span class="keyword">for</span> d <span class="keyword">in</span> sum_div:</span><br><span class="line">            sumspan = d.find(<span class="string">'span'</span>, class_=<span class="string">'inq'</span>)</span><br><span class="line">            summary = sumspan.get_text() <span class="keyword">if</span> sumspan <span class="keyword">else</span> <span class="string">'无'</span></span><br><span class="line">            sums.append(summary)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> name, author, score, sum <span class="keyword">in</span> zip(names, authors, scores, sums):</span><br><span class="line">            name = <span class="string">'书名'</span> + str(name) + <span class="string">'\n'</span></span><br><span class="line">            author = <span class="string">'作者'</span> + str(author) + <span class="string">'\n'</span></span><br><span class="line">            score = <span class="string">'评分'</span> + str(score) + <span class="string">'\n'</span></span><br><span class="line">            sum = <span class="string">'简介'</span> + str(sum) + <span class="string">'\n'</span></span><br><span class="line">            data = name + author + score + sum</span><br><span class="line">            <span class="comment"># 保存数据</span></span><br><span class="line">            f.writelines(data + <span class="string">'====================='</span> + <span class="string">'\n'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取所有页面的函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">all_page</span><span class="params">()</span>:</span></span><br><span class="line">    base_url = <span class="string">'https://book.douban.com/top250?start='</span></span><br><span class="line">    urllist = []</span><br><span class="line">    <span class="comment"># 从0到255,间隔25的数组</span></span><br><span class="line">    <span class="keyword">for</span> page <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">250</span>, <span class="number">25</span>):</span><br><span class="line">        allurl = base_url + str(page)</span><br><span class="line">        urllist.append(allurl)</span><br><span class="line">    <span class="keyword">return</span> urllist</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 文件名</span></span><br><span class="line">filename = <span class="string">'豆瓣图书Top250.txt'</span></span><br><span class="line"><span class="comment"># 保存文件操作</span></span><br><span class="line">f = open(filename, <span class="string">'w'</span>, encoding=<span class="string">'utf-8'</span>)</span><br><span class="line"><span class="comment"># 调用函数</span></span><br><span class="line">html_parse()</span><br><span class="line">f.close()</span><br><span class="line">print(<span class="string">'保存成功'</span>)</span><br></pre></td></tr></table></figure>
-<p>上一章已经学过 BeautifulSoup 强大解析工具的用法，相信大家都掌握了，通过这个豆瓣图书Top250实例，可以对大家学习过的 BeautifulSoup 进行练手，然后更牢固扎根基础知识。</p>
-<p>最后，大家一起努力吧！</p>
-
-          
+          <p>今天，我贴出两种方式实战内容，一个运用正则表达式，另一个运用 BeautifulSoup 来写的，之前没有过多介绍正则表达式的用法，今天看一下实例，了解一下。而我推荐大家用 BeautifulSoup 来爬取数据。毕竟每个人的兴趣不一，或许还有其他方法，看你个人喜欢用哪种爬虫，就用哪种吧！我个人喜欢用 BeautifulSoup 强大的解析工具爬虫。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/19/Python/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -695,12 +694,24 @@
                 
               
 
-              <time title="创建时间：2018-07-18 14:55:37 / 修改时间：16:10:24" itemprop="dateCreated datePublished" datetime="2018-07-18T14:55:37+08:00">2018-07-18</time>
+              <time title="创建时间：2018-07-18 14:55:37" itemprop="dateCreated datePublished" datetime="2018-07-18T14:55:37+08:00">2018-07-18</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:59:53" itemprop="dateModified" datetime="2019-02-06T00:59:53+08:00">2019-02-06</time>
               
             
           </span>
@@ -752,51 +763,14 @@
 
       
         
-          
-            <p>相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。</p>
-<h2 id="什么是BeautifulSoup？"><a href="#什么是BeautifulSoup？" class="headerlink" title="什么是BeautifulSoup？"></a>什么是BeautifulSoup？</h2><p>Python的网页解析可以用正则表达式去完成，那么我们在写的时候，要挨个的去把代码拿出来匹配，而且还要写匹配的规则，整体实现起来就很复杂。BeautifulSoup呢，它是一个方便的网页解析库，处理高效，支持多种解析器。大部分情况下，利用它我们不在需要编写正则表达式就可以方便的实现网页信息的提取。</p>
-<p>BeautifulSoup是一个网页解析库，它支持很多解析器，不过最主流的有两个。一个是Python标准库，一个是lxml HTML 解析器。两者的使用方法相似：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"></span><br><span class="line"><span class="comment"># Python的标准库</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'html.parser'</span>)</span><br><span class="line"><span class="comment"># lxml</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br></pre></td></tr></table></figure>
-<p>Python内置标准库的执行速度一般，但是低版本的Python中，中文的容错能力比较差。lxmlHTML 解析器的执行速度快，但是需要安装 C语言的依赖库。</p>
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>在开始之前，请确保已经正确安装好了Beautiful Soup和lxml，如果没有安装,看下面：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install beautifulsoup4</span><br><span class="line">pip install lxml</span><br></pre></td></tr></table></figure>
-<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p>下面首先用实例来看看Beautiful Soup的基本用法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">html = <span class="string">"""</span></span><br><span class="line"><span class="string">&lt;html&gt;&lt;head&gt;&lt;title&gt;The Dormouse's story&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br><span class="line"><span class="string">&lt;p class="title" name="dromouse"&gt;&lt;b&gt;The Dormouse's story&lt;/b&gt;&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;p class="story"&gt;Once upon a time there were three little sisters; and their names were</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/elsie" class="sister" id="link1"&gt;&lt;!-- Elsie --&gt;&lt;/a&gt;,</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/lacie" class="sister" id="link2"&gt;Lacie&lt;/a&gt; and</span></span><br><span class="line"><span class="string">&lt;a href="http://example.com/tillie" class="sister" id="link3"&gt;Tillie&lt;/a&gt;;</span></span><br><span class="line"><span class="string">and they lived at the bottom of a well.&lt;/p&gt;</span></span><br><span class="line"><span class="string">&lt;p class="story"&gt;...&lt;/p&gt;</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.prettify())</span><br><span class="line">print(soup.title.string)</span><br></pre></td></tr></table></figure>
-<p>运行结果如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line"> &lt;head&gt;</span><br><span class="line">  &lt;title&gt;</span><br><span class="line">   The Dormouse's story</span><br><span class="line">  &lt;/title&gt;</span><br><span class="line"> &lt;/head&gt;</span><br><span class="line"> &lt;body&gt;</span><br><span class="line">  &lt;p class="title" name="dromouse"&gt;</span><br><span class="line">   &lt;b&gt;</span><br><span class="line">    The Dormouse's story</span><br><span class="line">   &lt;/b&gt;</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line">  &lt;p class="story"&gt;</span><br><span class="line">   Once upon a time there were three little sisters; and their names were</span><br><span class="line">   &lt;a class="sister" href="http://example.com/elsie" id="link1"&gt;</span><br><span class="line">    &lt;!-- Elsie --&gt;</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   ,</span><br><span class="line">   &lt;a class="sister" href="http://example.com/lacie" id="link2"&gt;</span><br><span class="line">    Lacie</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   and</span><br><span class="line">   &lt;a class="sister" href="http://example.com/tillie" id="link3"&gt;</span><br><span class="line">    Tillie</span><br><span class="line">   &lt;/a&gt;</span><br><span class="line">   ;</span><br><span class="line">and they lived at the bottom of a well.</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line">  &lt;p class="story"&gt;</span><br><span class="line">   ...</span><br><span class="line">  &lt;/p&gt;</span><br><span class="line"> &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">The Dormouse's story</span><br></pre></td></tr></table></figure>
-<p>你看，我们可以通过简单调用几个属性完成文本提取，这是不是非常方便？</p>
-<h2 id="提取信息"><a href="#提取信息" class="headerlink" title="提取信息"></a>提取信息</h2><h3 id="获取名称"><a href="#获取名称" class="headerlink" title="获取名称"></a>获取名称</h3><p>可以利用name属性获取节点的名称。这里还是以上面的文本为例，选取title节点，然后调用name属性就可以得到节点名称：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printp (soup.title.name)</span><br></pre></td></tr></table></figure>
-<h3 id="获取属性"><a href="#获取属性" class="headerlink" title="获取属性"></a>获取属性</h3><p>每个节点可能有多个属性，比如id和class等，选择这个节点元素后，可以调用attrs获取所有属性：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(soup.p.attrs)</span><br><span class="line">print(soup.p.attrs[<span class="string">'name'</span>])</span><br></pre></td></tr></table></figure>
-<h3 id="获取内容"><a href="#获取内容" class="headerlink" title="获取内容"></a>获取内容</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printp (soup.p.string)</span><br></pre></td></tr></table></figure>
-<h2 id="方法选择器"><a href="#方法选择器" class="headerlink" title="方法选择器"></a>方法选择器</h2><p>虽然BeautifulSoup的基本用法，标签获取，内容获取，可以解析一些 html代码。但是在遇到很多复杂的页面时，上面的方法是完全不足的，或者是很繁琐的，因为有时候有的标签会有几个属性（class、id等）。</p>
-<p>索性BeautifulSoup给我们提供了很方便的方法选择器，也就是 API 方法，这里着重介绍2个: find() 和 find_all() 。其它方法的参数和用法类似,大家举一反三吧。</p>
-<h3 id="find-all"><a href="#find-all" class="headerlink" title="find_all()"></a>find_all()</h3><p>find_all，顾名思义，就是查询所有符合条件的元素。给它传入一些属性或文本，就可以得到符合条件的元素，它的功能十分强大。</p>
-<p>它的API如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find_all(name , attrs , recursive , text , **kwargs)</span><br></pre></td></tr></table></figure>
-<h4 id="name"><a href="#name" class="headerlink" title="name()"></a>name()</h4><p>我们可以根据节点名来查询元素，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(soup.find_all(name=<span class="string">'ul'</span>))</span><br></pre></td></tr></table></figure>
-<h4 id="attrs"><a href="#attrs" class="headerlink" title="attrs"></a>attrs</h4><p>除了根据节点名查询，我们也可以传入一些属性来查询，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">print(soup.find_all(attrs=&#123;<span class="string">'name'</span>: <span class="string">'elements'</span>&#125;))</span><br></pre></td></tr></table></figure>
-<h4 id="text"><a href="#text" class="headerlink" title="text"></a>text</h4><p>text参数可用来匹配节点的文本，传入的形式可以是字符串，可以是正则表达式对象，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line">html=<span class="string">'''</span></span><br><span class="line"><span class="string">&lt;div class="panel"&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-body"&gt;</span></span><br><span class="line"><span class="string">        &lt;a&gt;Hello, this is a link&lt;/a&gt;</span></span><br><span class="line"><span class="string">        &lt;a&gt;Hello, this is a link, too&lt;/a&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.find_all(text=re.compile(<span class="string">'link'</span>)))</span><br></pre></td></tr></table></figure>
-<h3 id="find"><a href="#find" class="headerlink" title="find()"></a>find()</h3><p>除了find_all()方法，还有find()方法，只不过后者返回的是单个元素，也就是第一个匹配的元素，而前者返回的是所有匹配的元素组成的列表。示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">html=<span class="string">'''</span></span><br><span class="line"><span class="string">&lt;div class="panel"&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-heading"&gt;</span></span><br><span class="line"><span class="string">        &lt;h4&gt;Hello&lt;/h4&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">    &lt;div class="panel-body"&gt;</span></span><br><span class="line"><span class="string">        &lt;ul class="list" id="list-1"&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Foo&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Bar&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Jay&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">        &lt;ul class="list list-small" id="list-2"&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Foo&lt;/li&gt;</span></span><br><span class="line"><span class="string">            &lt;li class="element"&gt;Bar&lt;/li&gt;</span></span><br><span class="line"><span class="string">        &lt;/ul&gt;</span></span><br><span class="line"><span class="string">    &lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line">print(soup.find(name=<span class="string">'ul'</span>))</span><br><span class="line">print(soup.find(class_=<span class="string">'list'</span>))</span><br></pre></td></tr></table></figure>
-<p>find_all()、find()方法完全相同，只不过查询范围不同。</p>
-<h2 id="CSS选择器"><a href="#CSS选择器" class="headerlink" title="CSS选择器"></a>CSS选择器</h2><p>Beautiful Soup还提供了另外一种选择器，那就是CSS选择器。如果对Web开发熟悉的话，那么对CSS选择器肯定也不陌生。</p>
-<h3 id="嵌套选择"><a href="#嵌套选择" class="headerlink" title="嵌套选择"></a>嵌套选择</h3><p>select()方法同样支持嵌套选择。例如，先选择所有ul节点，再遍历每个ul节点，选择其li节点，样例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> ul <span class="keyword">in</span> soup.select(<span class="string">'ul'</span>):</span><br><span class="line">    print(ul.select(<span class="string">'li'</span>))</span><br></pre></td></tr></table></figure>
-<p>运行后可以看到，这里正常输出了所有ul节点下所有li节点组成的列表。</p>
-<h3 id="获取属性-1"><a href="#获取属性-1" class="headerlink" title="获取属性"></a>获取属性</h3><p>我们知道节点类型是Tag类型，所以获取属性还可以用原来的方法。仍然是上面的HTML文本，这里尝试获取每个ul节点的id属性：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> ul <span class="keyword">in</span> soup.select(<span class="string">'ul'</span>):</span><br><span class="line">    print(ul[<span class="string">'id'</span>])</span><br><span class="line">    print(ul.attrs[<span class="string">'id'</span>])</span><br></pre></td></tr></table></figure>
-<p>运行后可以看到，直接传入中括号和属性名，以及通过attrs属性获取属性值，都可以成功。</p>
-<h3 id="获取文本"><a href="#获取文本" class="headerlink" title="获取文本"></a>获取文本</h3><p>要获取文本，当然也可以用前面所讲的string属性。此外，还有一个方法，那就是get_text()，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br><span class="line"><span class="keyword">for</span> li <span class="keyword">in</span> soup.select(<span class="string">'li'</span>):</span><br><span class="line">    print(<span class="string">'Get Text:'</span>, li.get_text())</span><br><span class="line">    print(<span class="string">'String:'</span>, li.string)</span><br></pre></td></tr></table></figure>
-<p>运行后可以看到，二者的效果完全一致。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>推荐使用lxml解析库，必要时使用html.parser。<br>节点选择筛选功能弱但是速度快。<br>建议使用find()或者find_all()查询匹配单个结果或者多个结果。<br>如果对CSS选择器熟悉的话，可以使用select()方法选择。</p>
-
-          
+          <p>相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/18/Python/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -894,12 +868,24 @@
                 
               
 
-              <time title="创建时间：2018-07-17 08:42:12 / 修改时间：10:29:34" itemprop="dateCreated datePublished" datetime="2018-07-17T08:42:12+08:00">2018-07-17</time>
+              <time title="创建时间：2018-07-17 08:42:12" itemprop="dateCreated datePublished" datetime="2018-07-17T08:42:12+08:00">2018-07-17</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:59:42" itemprop="dateModified" datetime="2019-02-06T00:59:42+08:00">2019-02-06</time>
               
             
           </span>
@@ -951,51 +937,14 @@
 
       
         
-          
-            <p>在前一节中，我们了解了requests的基本用法，如基本的GET、POST请求以及Response对象。本节中，我们再来了解下requests的一些高级用法，如文件上传、cookie设置、代理设置等。</p>
-<h3 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">files = &#123;<span class="string">'file'</span>: open(<span class="string">'favicon.ico'</span>, <span class="string">'rb'</span>)&#125;</span><br><span class="line">r = requests.post(<span class="string">'http://httpbin.org/post'</span>, files=files)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
-<p>文件上传的操作只要我们从文件夹中把文件读取出来，并且赋值给 files 参数，就可以了，打印出源代码我们就可以看待上传文件的字节流了。</p>
-<h3 id="获取Cookie"><a href="#获取Cookie" class="headerlink" title="获取Cookie"></a>获取Cookie</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">r = requests.get(<span class="string">'http://www.baidu.com'</span>)</span><br><span class="line">print(r.cookies)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> key, value <span class="keyword">in</span> r.cookies.items():</span><br><span class="line">    print(key + <span class="string">'='</span> + value)</span><br></pre></td></tr></table></figure>
-<p>通过获取字典的键值对来查看 Cookie.</p>
-<h3 id="会话维持"><a href="#会话维持" class="headerlink" title="会话维持"></a>会话维持</h3><p>在requests中，如果直接利用get()或post()等方法的确可以做到模拟网页的请求，但是这实际上是相当于不同的会话，也就是说相当于你用了两个浏览器打开了不同的页面。</p>
-<p>有朋友可能说了，我在两次请求时设置一样的cookies不就行了？可以，但这样做起来显得很烦琐，我们有更简单的解决方法。</p>
-<p>其实解决这个问题的主要方法就是维持同一个会话，也就是相当于打开一个新的浏览器选项卡而不是新开一个浏览器。但是我又不想每次设置cookies，那该怎么办呢？这时候就有了新的利器——Session对象。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">s = requests.Session()</span><br><span class="line">s.get(<span class="string">'http://httpbin.org/cookies/set/number/123456789'</span>)</span><br><span class="line">r = s.get(<span class="string">'http://httpbin.org/cookies'</span>)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
-<p>所以，利用Session，可以做到模拟同一个会话而不用担心Cookies的问题。它通常用于模拟登录成功之后再进行下一步的操作。</p>
-<h3 id="SSL证书验证"><a href="#SSL证书验证" class="headerlink" title="SSL证书验证"></a>SSL证书验证</h3><p>此外，requests还提供了证书验证的功能。当发送HTTP请求的时候，它会检查SSL证书，我们可以使用verify参数控制是否检查此证书。其实如果不加verify参数的话，默认是True，会自动验证。</p>
-<p>现在我们用requests来测试一下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
-<p>运行后提示一个错误 SSLError，表示证书验证错误。所以，如果请求一个 HTTPS 站点，但是证书验证错误页面时，<br>就会报这样的错误，那么怎么避免这个错误呢？很简单，把 verify 参数设置为 False 即可。相关代码如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, verify=<span class="keyword">False</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
-<p>不过我们发现报了一个警告，他建议我们给它指定证书。我们可以通过忽略警告的方式来屏蔽这个警告：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> requests.packages <span class="keyword">import</span> urllib3</span><br><span class="line"> </span><br><span class="line">urllib3.disable_warnings()</span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, verify=<span class="keyword">False</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
-<p>或者通过捕捉警告到日志的方式忽略警告：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">logging.captureWarnings(<span class="keyword">True</span>)</span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, verify=<span class="keyword">False</span>)</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
-<p>当然，我们也可以指定一个本地证书用作客户端证书，这可以是单个文件（包含密钥和证书）或一个包含两个文件路径的元组：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">response = requests.get(<span class="string">'https://www.12306.cn'</span>, cert=(<span class="string">'/path/server.crt'</span>, <span class="string">'/path/key'</span>))</span><br><span class="line">print(response.status_code)</span><br></pre></td></tr></table></figure>
-<p>当然，上面的代码是演示实例，我们需要有crt和key文件，并且指定它们的路径。注意，本地私有证书的key必须是解密状态，加密状态的key是不支持的。当然，上面的代码是演示实例，我们需要有crt和key文件，并且指定它们的路径。注意，本地私有证书的key必须是解密状态，加密状态的key是不支持的。</p>
-<h3 id="代理设置"><a href="#代理设置" class="headerlink" title="代理设置"></a>代理设置</h3><p>对于某些网站，在测试的时候请求几次，能正常获取内容。但是一旦开始大规模爬取，对于大规模且频繁的请求，网站可能会弹出验证码，或者跳转到登录认证页面，更甚者可能会直接封禁客户端的IP，导致一定时间段内无法访问。</p>
-<p>那么，为了防止这种情况发生，我们需要设置代理来解决这个问题，这就需要用到proxies参数。可以用这样的方式设置：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">proxies = &#123;</span><br><span class="line">  <span class="string">"http"</span>: <span class="string">"http://10.10.1.10:3128"</span>,</span><br><span class="line">  <span class="string">"https"</span>: <span class="string">"http://10.10.1.10:1080"</span>,</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">requests.get(<span class="string">"https://www.taobao.com"</span>, proxies=proxies)</span><br></pre></td></tr></table></figure>
-<p>当然，直接运行这个实例可能不行，因为这个代理可能是无效的，请换成自己的有效代理试验一下。</p>
-<p>除了基本的HTTP代理外，requests还支持SOCKS协议的代理。</p>
-<p>首先，需要安装socks这个库:<br>pip3 install ‘requests[socks]’</p>
-<p>然后就可以使用SOCKS协议代理了，实例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">proxies = &#123;</span><br><span class="line">    <span class="string">'http'</span>: <span class="string">'socks5://user:password@host:port'</span>,</span><br><span class="line">    <span class="string">'https'</span>: <span class="string">'socks5://user:password@host:port'</span></span><br><span class="line">&#125;</span><br><span class="line">requests.get(<span class="string">"https://www.taobao.com"</span>, proxies=proxies)</span><br></pre></td></tr></table></figure>
-<h3 id="超时设置"><a href="#超时设置" class="headerlink" title="超时设置"></a>超时设置</h3><p>在本机网络状况不好或者服务器网络响应太慢甚至无响应时，我们可能会等待特别久的时间才可能收到响应，甚至到最后收不到响应而报错。为了防止服务器不能及时响应，应该设置一个超时时间，即超过了这个时间还没有得到响应，那就报错。这需要用到timeout参数。这个时间的计算是发出请求到服务器返回响应的时间。示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">"https://www.taobao.com"</span>, timeout = <span class="number">1</span>)</span><br><span class="line">print(r.status_code)</span><br></pre></td></tr></table></figure>
-<p>如果想永久等待，可以直接将timeout设置为None，或者不设置直接留空，因为默认是None。这样的话，如果服务器还在运行，但是响应特别慢，那就慢慢等吧，它永远不会返回超时错误的。其用法如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r = requests.get(<span class="string">'https://www.taobao.com'</span>, timeout=<span class="keyword">None</span>)</span><br></pre></td></tr></table></figure>
-<p>或直接不加参数：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r = requests.get(<span class="string">'https://www.taobao.com'</span>)</span><br></pre></td></tr></table></figure>
-<h3 id="身份验证"><a href="#身份验证" class="headerlink" title="身份验证"></a>身份验证</h3><p>有一些网站在访问的时候需要我们输入用户名和密码，那么这种网站我们要怎样处理呢。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> requests.auth <span class="keyword">import</span> HTTPBasicAuth</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">'http://localhost:5000'</span>, auth=HTTPBasicAuth(<span class="string">'username'</span>, <span class="string">'password'</span>))</span><br><span class="line">print(r.status_code)</span><br></pre></td></tr></table></figure>
-<p>调用HTTPBasicAuth类，直接传入用户名和密码就可以了。</p>
-<h3 id="Prepared-Request"><a href="#Prepared-Request" class="headerlink" title="Prepared Request"></a>Prepared Request</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> requests <span class="keyword">import</span> Request, Session</span><br><span class="line"></span><br><span class="line">url = <span class="string">'http://httpbin.org/post'</span></span><br><span class="line">data = &#123;</span><br><span class="line">    <span class="string">'name'</span>: <span class="string">'germey'</span></span><br><span class="line">&#125;</span><br><span class="line">headers = &#123;</span><br><span class="line">     <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line">s = Session()</span><br><span class="line">r = Request(<span class="string">'POST'</span>, url, data=data, headers=headers)</span><br><span class="line">prepped = s.prepare_request(r)</span><br><span class="line">r = s.send(prepped)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
-<p>可以看到，我们达到了同样的POST请求效果。</p>
-<p>最后，今天讲解了requests的一些高级用法，这些用法在后面实战部分会经常用到，需要熟练掌握。我们共同努力吧！</p>
-
-          
+          <p>在前一节中，我们了解了requests的基本用法，如基本的GET、POST请求以及Response对象。本节中，我们再来了解下requests的一些高级用法，如文件上传、cookie设置、代理设置等。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/17/Python/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1093,12 +1042,24 @@
                 
               
 
-              <time title="创建时间：2018-07-16 13:20:07 / 修改时间：15:24:54" itemprop="dateCreated datePublished" datetime="2018-07-16T13:20:07+08:00">2018-07-16</time>
+              <time title="创建时间：2018-07-16 13:20:07" itemprop="dateCreated datePublished" datetime="2018-07-16T13:20:07+08:00">2018-07-16</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:59:25" itemprop="dateModified" datetime="2019-02-06T00:59:25+08:00">2019-02-06</time>
               
             
           </span>
@@ -1150,43 +1111,14 @@
 
       
         
-          
-            <p>虽然 urllib 库，它是 Python 内置的 HTTP 请求库，也就是说不需要额外安装即可使用，但是我并不推荐。因为 urllib 在很多时候确实有不方便的地方，比如处理网页验证和 Cookies 时，需要写 Opener 和 Handler 来处理。为了更加方便地实现这些操作，就有了更为强大的库 requests，有了它，Cookies、登录验证、代理设置等操作都不是事儿。</p>
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>在开始之前，请确保已经安装好了 requests 库。如果没有安装，安装也很简单：pip install requests</p>
-<h2 id="语法基础"><a href="#语法基础" class="headerlink" title="语法基础"></a>语法基础</h2><h3 id="实例引入"><a href="#实例引入" class="headerlink" title="实例引入"></a>实例引入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">'https://www.baidu.com/'</span>)</span><br><span class="line">print(r.status_code)</span><br><span class="line">print(type(r.text))</span><br><span class="line">print(r.text)</span><br><span class="line">print(r.cookies)</span><br></pre></td></tr></table></figure>
-<p>运行结果：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">200</span><br><span class="line">&lt;class 'str'&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> ...HTML网页源码...</span></span><br><span class="line">&lt;RequestsCookieJar[]&gt;</span><br></pre></td></tr></table></figure>
-<p>通过运行结果可以发现，我们很方便就获取到了Cookies.</p>
-<h3 id="各种请求类型"><a href="#各种请求类型" class="headerlink" title="各种请求类型"></a>各种请求类型</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">r = requests.post(<span class="string">'http://httpbin.org/post'</span>)</span><br><span class="line">r = requests.put(<span class="string">'http://httpbin.org/put'</span>)</span><br><span class="line">r = requests.delete(<span class="string">'http://httpbin.org/delete'</span>)</span><br><span class="line">r = requests.head(<span class="string">'http://httpbin.org/get'</span>)</span><br><span class="line">r = requests.options(<span class="string">'http://httpbin.org/get'</span>)</span><br></pre></td></tr></table></figure>
-<p>这里分别用post()、put()、delete()等方法实现了POST、PUT、DELETE等请求。其实这只是冰山一角，更多的还在后面。</p>
-<h2 id="请求"><a href="#请求" class="headerlink" title="请求"></a>请求</h2><h3 id="GET请求"><a href="#GET请求" class="headerlink" title="GET请求"></a>GET请求</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">'http://httpbin.org/get'</span>)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
-<p>HTTP中最常用的请求之一就是GET请求，运行成功你就会看到源码了。</p>
-<h3 id="带参数GET请求"><a href="#带参数GET请求" class="headerlink" title="带参数GET请求"></a>带参数GET请求</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">data = &#123;</span><br><span class="line">    <span class="string">'name'</span>: <span class="string">'germey'</span>,</span><br><span class="line">    <span class="string">'age'</span>: <span class="number">22</span></span><br><span class="line">&#125;</span><br><span class="line">r = requests.get(<span class="string">"http://httpbin.org/get"</span>, params=data)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
-<p>是不是感觉很简单，传入参数只需要我们把数据生成字典，调用 params 这个参数赋值就好了。</p>
-<h3 id="解析-json"><a href="#解析-json" class="headerlink" title="解析 json()"></a>解析 json()</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">"http://httpbin.org/get"</span>)</span><br><span class="line">print(type(r.text))</span><br><span class="line">print(r.json())</span><br><span class="line">print(type(r.json()))</span><br></pre></td></tr></table></figure>
-<p>运行结果如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;class 'str'&gt;</span><br><span class="line">&#123;'headers': &#123;'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Host': 'httpbin.org', 'User-Agent': 'python-requests/2.10.0'&#125;, 'url': 'http://httpbin.org/get', 'args': &#123;&#125;, 'origin': '182.33.248.131'&#125;</span><br><span class="line">&lt;class 'dict'&gt;</span><br></pre></td></tr></table></figure>
-<p>可以发现，调用json()方法，就可以将返回结果是JSON格式的字符串转化为字典。</p>
-<h3 id="获取二进制数据"><a href="#获取二进制数据" class="headerlink" title="获取二进制数据"></a>获取二进制数据</h3><p>图片、音频、视频这些文件本质上都是由二进制码组成的，由于有特定的保存格式和对应的解析方式，我们才可以看到这些形形色色的多媒体。所以，想要抓取它们，就要拿到它们的二进制码。</p>
-<p>下面以GitHub的站点图标为例来看一下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">"https://github.com/favicon.ico"</span>)</span><br><span class="line">print(r.text)</span><br><span class="line">print(r.content)</span><br></pre></td></tr></table></figure>
-<p>接着，我们将刚才提取到的图片保存下来：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'favicon.ico'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(r.content)</span><br></pre></td></tr></table></figure>
-<p>同样地，音频和视频文件也可以用这种方法获取。</p>
-<h3 id="添加-headers"><a href="#添加-headers" class="headerlink" title="添加 headers"></a>添加 headers</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line">r = requests.get(<span class="string">"https://www.zhihu.com/explore"</span>, headers=headers)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
-<p>有些网页如果我们直接去请求的话，他会查看请求的对象是不是浏览器，如果没有浏览器信息就会禁止我们爬虫的访问，这个时候我们就要给爬虫加一个headers，加一个浏览器的user-agent信息。这样我们就可以正常访问了。如果有的朋友不知道怎么得到User-Agent，可以按F12，找到network，然后刷新页面就看到了。</p>
-<h3 id="POST请求"><a href="#POST请求" class="headerlink" title="POST请求"></a>POST请求</h3><p>前面我们了解了最基本的GET请求，另外一种比较常见的请求方式是POST。使用requests实现POST请求同样非常简单，示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">data = &#123;<span class="string">'name'</span>: <span class="string">'germey'</span>, <span class="string">'age'</span>: <span class="string">'22'</span>&#125;</span><br><span class="line">r = requests.post(<span class="string">"http://httpbin.org/post"</span>, data=data)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
-<p>运行结果如下：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"args"</span>: &#123;&#125;, </span><br><span class="line">  <span class="attr">"data"</span>: <span class="string">""</span>, </span><br><span class="line">  <span class="attr">"files"</span>: &#123;&#125;, </span><br><span class="line">  <span class="attr">"form"</span>: &#123;</span><br><span class="line">    <span class="attr">"age"</span>: <span class="string">"22"</span>, </span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"germey"</span></span><br><span class="line">  &#125;, </span><br><span class="line">  <span class="attr">"headers"</span>: &#123;</span><br><span class="line">    <span class="attr">"Accept"</span>: <span class="string">"*/*"</span>, </span><br><span class="line">    <span class="attr">"Accept-Encoding"</span>: <span class="string">"gzip, deflate"</span>, </span><br><span class="line">    <span class="attr">"Content-Length"</span>: <span class="string">"18"</span>, </span><br><span class="line">    <span class="attr">"Content-Type"</span>: <span class="string">"application/x-www-form-urlencoded"</span>, </span><br><span class="line">    <span class="attr">"Host"</span>: <span class="string">"httpbin.org"</span>, </span><br><span class="line">    <span class="attr">"User-Agent"</span>: <span class="string">"python-requests/2.10.0"</span></span><br><span class="line">  &#125;, </span><br><span class="line">  <span class="attr">"json"</span>: <span class="literal">null</span>, </span><br><span class="line">  <span class="attr">"origin"</span>: <span class="string">"182.33.248.131"</span>, </span><br><span class="line">  <span class="attr">"url"</span>: <span class="string">"http://httpbin.org/post"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以发现，我们成功获得了返回结果，其中form部分就是提交的数据，这就证明POST请求成功发送了。</p>
-<h2 id="响应"><a href="#响应" class="headerlink" title="响应"></a>响应</h2><h3 id="响应的属性"><a href="#响应的属性" class="headerlink" title="响应的属性"></a>响应的属性</h3><p>发送请求后，得到的自然就是响应。在上面的实例中，我们使用text和content获取了响应的内容。此外，还有很多属性和方法可以用来获取其他信息，比如状态码、响应头、Cookies等。示例如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">'http://www.jianshu.com'</span>)</span><br><span class="line">print(type(r.status_code), r.status_code) <span class="comment"># 状态码</span></span><br><span class="line">print(type(r.headers), r.headers) <span class="comment"># 响应头</span></span><br><span class="line">print(type(r.cookies), r.cookies) <span class="comment"># Cookies</span></span><br><span class="line">print(type(r.url), r.url) <span class="comment"># URL</span></span><br><span class="line">print(type(r.history), r.history) <span class="comment"># 访问历史记录</span></span><br></pre></td></tr></table></figure>
-<h3 id="状态码查询"><a href="#状态码查询" class="headerlink" title="状态码查询"></a>状态码查询</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">r = requests.get(<span class="string">'http://www.jianshu.com'</span>)</span><br><span class="line">exit() <span class="keyword">if</span> <span class="keyword">not</span> r.status_code == <span class="number">200</span> <span class="keyword">else</span> print(<span class="string">'Request Successfully'</span>)</span><br></pre></td></tr></table></figure>
-<p>如果发送了一个错误请求(一个4XX客户端错误)，我们可以通过 requests.codes.not_found 来抛出异常。</p>
-<p>好了，requests 库的基本语法操作，就讲述到这里，相信大家对 requsts 库已经有一定的了解了，希望我们共同学习。</p>
-
-          
+          <p>虽然 urllib 库，它是 Python 内置的 HTTP 请求库，也就是说不需要额外安装即可使用，但是我并不推荐。因为 urllib 在很多时候确实有不方便的地方，比如处理网页验证和 Cookies 时，需要写 Opener 和 Handler 来处理。为了更加方便地实现这些操作，就有了更为强大的库 requests，有了它，Cookies、登录验证、代理设置等操作都不是事儿。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/16/Python/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1284,12 +1216,24 @@
                 
               
 
-              <time title="创建时间：2018-07-12 12:14:52 / 修改时间：14:05:34" itemprop="dateCreated datePublished" datetime="2018-07-12T12:14:52+08:00">2018-07-12</time>
+              <time title="创建时间：2018-07-12 12:14:52" itemprop="dateCreated datePublished" datetime="2018-07-12T12:14:52+08:00">2018-07-12</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:59:12" itemprop="dateModified" datetime="2019-02-06T00:59:12+08:00">2019-02-06</time>
               
             
           </span>
@@ -1341,23 +1285,15 @@
 
       
         
-          
-            <p>大家好，我是小白，来一起学习爬虫的基本原理。</p>
+          <p>大家好，我是小白，来一起学习爬虫的基本原理。</p>
 <p>这篇文章我来梳理一下爬虫的基本原理。用过 Python 的朋友都知道 Python 用来写爬虫是件很简单的事情。但是有的朋友不了解爬虫到底是什么，会想爬虫为什么设置请求头，请求体，到底要怎么去发送这个请求。当然也有的朋友使用过很多爬虫的库，解析库，写过很多爬虫案例，但是可能他们的思路脉络也不是太清晰。然而，你们的困惑我之前也有过。那么我就简单帮大家梳理一下爬虫原理。</p>
-<h2 id="什么是爬虫"><a href="#什么是爬虫" class="headerlink" title="什么是爬虫"></a>什么是爬虫</h2><p>爬虫即网络爬虫（Web Spider），又被称为网页蜘蛛，是一种按照一定的规则，自动地抓取网站信息的程序或者脚本。</p>
-<p>就如，我们在浏览器输入网址，回车，得到我们需要的网络信息。这就是浏览器请求网站的服务器，获取到网络资源。爬虫也相当于模拟浏览器发送请求，获得到HTML代码。HTML代码里通常包含了标签和文字信息，我们就从中提取到我们想要的信息。</p>
-<p>通常爬虫是从某个网站的某个页面开始，爬取这个页面的内容，找到网页中的其他链接地址，然后从这个地址爬到下一个页面，这样一直不停的爬下去，进去批量的抓取信息。那么，我们可以看出网络爬虫就是一个不停爬取网页抓取信息的程序。</p>
-<h2 id="爬虫的基本流程"><a href="#爬虫的基本流程" class="headerlink" title="爬虫的基本流程"></a>爬虫的基本流程</h2><h3 id="发送请求"><a href="#发送请求" class="headerlink" title="发送请求"></a>发送请求</h3><p>通过 HTTP 库向目标站点发送请求，即发送一个 Request,然后等待服务器响应。这个请求的过程相当于浏览客户端在浏览器地址栏输入网址：<a href="https://www.google.com，然后点击回车，向服务端发送一次请求。" target="_blank" rel="noopener">https://www.google.com，然后点击回车，向服务端发送一次请求。</a></p>
-<h3 id="响应内容"><a href="#响应内容" class="headerlink" title="响应内容"></a>响应内容</h3><p>如果服务器能正常响应，我们会得到一个 Response，Response 的内容就是你所要获取的内容，这个过程就是服务器接收客户端的请求，类型可能有HTML、Json字符串，二进制数据等类型。进过解析发送给浏览器的网页HTML文件。</p>
-<h3 id="解析内容"><a href="#解析内容" class="headerlink" title="解析内容"></a>解析内容</h3><p>如果得到的内容是 HTML，可以网页解析库进行解析，得到的是 Json，可以转为 Json 对象解析。得到二进制数据，可以做保存或者进一步处理。这些就像浏览器吧服务器端的文件获取到本地，再进行解析并展现出来。</p>
-<h3 id="保存数据"><a href="#保存数据" class="headerlink" title="保存数据"></a>保存数据</h3><p>保存的方式可以是把数据存为文本，也可以把数据保存到数据库等。</p>
-<h2 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h2><h3 id="什么是-Request？"><a href="#什么是-Request？" class="headerlink" title="什么是 Request？"></a>什么是 Request？</h3><p>浏览器发送信息给该网址所在的服务器，这个过程就是做 HTTP Request。</p>
-<h3 id="Request-中包含什么？"><a href="#Request-中包含什么？" class="headerlink" title="Request 中包含什么？"></a>Request 中包含什么？</h3><p>请求方式：请求方式的主要类型是GET，POST两种，另外还有HEAD、PUT、DELETE等。GET 请求的请求参数会显示在URL链接的后面，比如我们打开谷歌，搜索“图片”，我们会看到请求的URL链接为<a href="https://www.google.com/s?wd=图片。而" target="_blank" rel="noopener">https://www.google.com/s?wd=图片。而</a> POST 请求的请求参数会存放在Request内，并不会出现在 URL 链接的后面，比如我们登录QQ邮箱，输入用户名和密码，我们会看到浏览器开发者工具的Network页，Request请求有Form Data的键值对信息，那里就存放了我们的登录信息，有利于保护我们的账户信息安全。<br>请求 URL：URL 全称是统一资源定位符，也就是我们说的网址。比如一张图片，一个音乐文件，一个网页文档等都可以用唯一URL来确定，它包含的信息指出文件的位置以及浏览器应该怎么去处理它。<br>请求头(Request Headers)：请求头包含请求时的头部信息，如User-Agent（指定浏览器的请求头），authorization，Host，Cookies等信息。<br>请求体：请求体是请求是额外携带的数据，比如登录表单提交的登录信息数据。</p>
-<h2 id="Response"><a href="#Response" class="headerlink" title="Response"></a>Response</h2><h3 id="什么是-Response？"><a href="#什么是-Response？" class="headerlink" title="什么是 Response？"></a>什么是 Response？</h3><p>服务器收到浏览器发送的信息后，能够根据浏览器发送信息的内容，做出相应的处理，然后把信息回传给浏览器，这叫 HTTP Response。</p>
-<h3 id="Response-中包含什么？"><a href="#Response-中包含什么？" class="headerlink" title="Response 中包含什么？"></a>Response 中包含什么？</h3><p>响应状态：有多种响应状态，如200代表成功，301跳转页面，404表示找不到页面，502表示服务器错误。<br>响应头(Response Headers)：比如内容类型，内容长度，服务器信息，设置 Cookie 等。<br>响应体：响应体主要的部分，包含了请求资源的内容，比如网页 HTML 代码，图片二进制数据等。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>今天梳理了爬虫的基本流程，Request，Response，有兴趣的可以学习一下，我写得不好，请帮我指出，谢谢！</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/12/Python/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1455,12 +1391,24 @@
                 
               
 
-              <time title="创建时间：2018-07-02 10:56:27 / 修改时间：10:58:47" itemprop="dateCreated datePublished" datetime="2018-07-02T10:56:27+08:00">2018-07-02</time>
+              <time title="创建时间：2018-07-02 10:56:27" itemprop="dateCreated datePublished" datetime="2018-07-02T10:56:27+08:00">2018-07-02</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:58:51" itemprop="dateModified" datetime="2019-02-06T00:58:51+08:00">2019-02-06</time>
               
             
           </span>
@@ -1512,14 +1460,14 @@
 
       
         
-          
-            <p>今天遇了一个 python 试题，让我很经惊讶，我想，噫～～怎么看起来那么眼熟，这不是高中的数学题目？用 python 怎么实现呢？</p>
-<p>看实例，如下：</p>
-<p>题目：两个乒乓球进行比赛，各出三人。甲队为a,b,c三人，乙队为x,y,z三人。已抽签决定比赛名单。有人向队员打听比赛的名单。a说他不和x比，c说他不和x，z比，请编程序找出三队赛手的名单。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(ord(<span class="string">'x'</span>), ord(<span class="string">'z'</span>) + <span class="number">1</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(ord(<span class="string">'x'</span>), ord(<span class="string">'z'</span>) + <span class="number">1</span>):</span><br><span class="line">        <span class="keyword">if</span> i != j:</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> range(ord(<span class="string">'x'</span>), ord(<span class="string">'z'</span>) + <span class="number">1</span>):</span><br><span class="line">                <span class="keyword">if</span> (i != k) <span class="keyword">and</span> (j != k):</span><br><span class="line">                    <span class="keyword">if</span> (i != ord(<span class="string">'x'</span>)) <span class="keyword">and</span> (k != ord(<span class="string">'x'</span>)) <span class="keyword">and</span> (k != ord(<span class="string">'z'</span>)):</span><br><span class="line">                        print(<span class="string">'order is a -- %s\t b -- %s\tc--%s'</span> % (chr(i), chr(j), chr(k)))</span><br></pre></td></tr></table></figure>
-<p>我是小白，若上面的代码有错误的可以留言告诉我，我将不胜感激，谢谢！</p>
-
-          
+          <p>今天遇了一个 python 试题，让我很经惊讶，我想，噫～～怎么看起来那么眼熟，这不是高中的数学题目？用 python 怎么实现呢？</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/02/Python/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1617,12 +1565,24 @@
                 
               
 
-              <time title="创建时间：2018-07-02 09:44:11 / 修改时间：11:04:03" itemprop="dateCreated datePublished" datetime="2018-07-02T09:44:11+08:00">2018-07-02</time>
+              <time title="创建时间：2018-07-02 09:44:11" itemprop="dateCreated datePublished" datetime="2018-07-02T09:44:11+08:00">2018-07-02</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:58:32" itemprop="dateModified" datetime="2019-02-06T00:58:32+08:00">2019-02-06</time>
               
             
           </span>
@@ -1674,18 +1634,14 @@
 
       
         
-          
-            <p>似乎很久没有写博文了，那就进入主题吧，今天通过这篇文章来学习 Python 继承、属性读取方法和装饰器。</p>
-<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p>当一个类继承另一个类是，它将继承父类的所有功能(如变量和方法)。这有助于重用代码。</p>
-<p>在下一个例子中我们首先创建一个叫做 Person 的类，然后创建两个派生类 Student 和 Teacher。当两个类都从 Person 类继承时，它们的类除了会有 Person 类的所有方法还会有自身用途的新方法和新变量。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        返回具有给定名称的Person对象</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        self.name = name</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_details</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        返回包含人名的字符串</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> self.name</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(Person)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    返回Student对象，采用name, branch, year 3个参数</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name, branch, year)</span>:</span></span><br><span class="line">        Person.__init__(self, name)</span><br><span class="line">        self.branch = branch</span><br><span class="line">        self.year = year</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_details</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        返回包含学生具体信息的字符串</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; student &#123;&#125; and is in &#123;&#125; year."</span>.format(self.name, self.branch, self.year)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Teacher</span><span class="params">(Person)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    返回Teacher 对象，采用字符串列表作为参数</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name, papers)</span>:</span></span><br><span class="line">        Person.__init__(self, name)</span><br><span class="line">        self.papers = papers</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_details</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&#123;&#125; teacher &#123;&#125;"</span>.format(self.name, <span class="string">','</span>.join(self.papers))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">person1 = Person(<span class="string">'Sachin'</span>)</span><br><span class="line">student1 = Student(<span class="string">'Kusha1'</span>, <span class="string">'CSE'</span>, <span class="number">2005</span>)</span><br><span class="line">teacher1 = Teacher(<span class="string">'Prasha1'</span>, [<span class="string">'c'</span>, <span class="string">'c++'</span>])</span><br><span class="line"></span><br><span class="line">print(person1.get_details())</span><br><span class="line">print(student1.get_details())</span><br><span class="line">print(teacher1.get_details())</span><br></pre></td></tr></table></figure>
-<h3 id="属性读取方法"><a href="#属性读取方法" class="headerlink" title="属性读取方法"></a>属性读取方法</h3><p>在 Python 中请不要使用属性(attributes)读取方法(getters 和 setters)。如果之前接触过其他语言(如 Java)，你可能会在你的类里定义属性读取方法，请不要这样做，直接使用属性就可以了，看下面：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">Student</span><span class="params">(object)</span>:</span></span><br><span class="line"><span class="meta">... </span>    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name)</span>:</span></span><br><span class="line"><span class="meta">... </span>        self.name = name</span><br><span class="line">...</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>std = Student(<span class="string">"Kushal Das"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(std.name)</span><br><span class="line">Kushal Das</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>std.name = <span class="string">"Python"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(std.name)</span><br><span class="line">Python</span><br></pre></td></tr></table></figure>
-<h3 id="装饰器"><a href="#装饰器" class="headerlink" title="装饰器"></a>装饰器</h3><p>如果你想要更精确的调整控制属性的权限，你可以使用 @property 装饰器，而@property 装饰器就是负责把一个方法变成属性调用的。看下面：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Account</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, rate)</span>:</span></span><br><span class="line">        <span class="string">"""帐号类，amount 是美元金额"""</span></span><br><span class="line">        self.__amt = <span class="number">0</span></span><br><span class="line">        self.rate = rate</span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">amount</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""账户余额(美元)"""</span></span><br><span class="line">        <span class="keyword">return</span> self.__amt</span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cny</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""账户余额(人民币)"""</span></span><br><span class="line">        <span class="keyword">return</span> self.__amt * self.rate</span><br><span class="line"></span><br><span class="line"><span class="meta">    @amount.setter</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">amount</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> value &lt; <span class="number">0</span>:</span><br><span class="line">            print(<span class="string">"sorry,no negative amount in the account."</span>)</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        self.__amt = value</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># 汇率</span></span><br><span class="line">    acc = Account(rate=<span class="number">6.63</span>)</span><br><span class="line">    acc.amount = <span class="number">20</span></span><br><span class="line">    print(<span class="string">"Dollar amount:"</span>, acc.amount)</span><br><span class="line">    print(<span class="string">"In CNY:"</span>, acc.cny)</span><br><span class="line">    acc.amount = <span class="number">-200</span></span><br><span class="line">    print(<span class="string">"Dollar amount:"</span>, acc.amount)</span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文章学习了 Python 继承、属性读取方法和装饰器，如果博友们看到有代码错误，请指出错处，我将不胜感激～～</p>
-
-          
+          <p>似乎很久没有写博文了，那就进入主题吧，今天通过这篇文章来学习 Python 继承、属性读取方法和装饰器。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/02/inherit/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1800,7 +1756,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-07-02 10:46:15" itemprop="dateModified" datetime="2018-07-02T10:46:15+08:00">2018-07-02</time>
+                <time title="修改时间：2019-02-06 00:58:16" itemprop="dateModified" datetime="2019-02-06T00:58:16+08:00">2019-02-06</time>
               
             
           </span>
@@ -1852,24 +1808,14 @@
 
       
         
-          
-            <p>最近，有位企业的老师给我们上课，课后布置了一个用 Java 实现冒泡排序的作业 ，然而，什么是冒泡排序呢？请看下面：</p>
-<h1 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h1><p>冒泡排序 (Bubble sort) 是一种最简单的交换排序算法。我猜，大概是所有程序员都会用到的算法吧。 </p>
-<h2 id="算法思路"><a href="#算法思路" class="headerlink" title="算法思路"></a>算法思路</h2><h3 id="第一轮排序"><a href="#第一轮排序" class="headerlink" title="第一轮排序"></a>第一轮排序</h3><p>比较两个相邻元素，如果第一个比第二个大，则交换两个元素的值。</p>
-<p>进行下两个元素的比较，即比较第二个和第三个元素，如果前者大于后者，则交换。</p>
-<p>再进行下两个元素的比较。直到较第 n-1 和第 n 元素进行比较，如果前者大于后者，则交换。</p>
-<p>可以知道，最后一个元素 n ，肯定是 n 个元素中最大的元素。</p>
-<h3 id="第二轮排序"><a href="#第二轮排序" class="headerlink" title="第二轮排序"></a>第二轮排序</h3><p>重复执行第一轮执行的动作，直到第 n-2 个元素和第 n-1 个元素进行比较。如前者大于后者，则交换。</p>
-<p>由于第一轮排序已经将最大元素放置到第 n 个位置，所以本次排序无考虑第 n 个元素。即第 n 个元素不参加本次排序。</p>
-<p>……</p>
-<h3 id="重复执行"><a href="#重复执行" class="headerlink" title="重复执行"></a>重复执行</h3><p>直到只剩一个元素，那么这个元素一定是最小元素，排序结束。显然，进行了 n-1 次排序。</p>
-<p>上述过程，每轮排序都会有一个元素从某个位置慢慢“浮动”到最终所属的位置,就像气泡总会浮动到水的最顶端。在冒泡排序中，每一轮排序都会有一个元素(气泡)替换到本次排序的最后一个位置(水的最顶端)，注意，是本次排序的最后一个位置(第一轮，则为 n；第二轮，则为 n-1；第三轮，则为 n-2 ~~~ )。</p>
-<h2 id="Java-代码实现"><a href="#Java-代码实现" class="headerlink" title="Java 代码实现"></a>Java 代码实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Num</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">int</span>[] arr = &#123;<span class="number">14</span>, <span class="number">4</span>, <span class="number">18</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">25</span>, &#125;;</span><br><span class="line">		Num.num(arr,arr.length);</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i : arr)</span><br><span class="line">		&#123;</span><br><span class="line">			System.out.print(i + <span class="string">"\t"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">num</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> l)</span></span></span><br><span class="line"><span class="function">	</span>&#123;</span><br><span class="line">		<span class="keyword">int</span> i,j;</span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; l; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">for</span> (j = <span class="number">1</span>; j &lt; l; j++)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">if</span> (a[j - <span class="number">1</span>] &gt; a[j])</span><br><span class="line">				&#123;</span><br><span class="line">					<span class="keyword">int</span> t;</span><br><span class="line">					t = a[j - <span class="number">1</span>];</span><br><span class="line">					a[j - <span class="number">1</span>] = a[j];</span><br><span class="line">					a[j] = t;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Python-代码实现"><a href="#Python-代码实现" class="headerlink" title="Python 代码实现"></a>Python 代码实现</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bubble</span><span class="params">(li)</span>:</span></span><br><span class="line">    count = len(li)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, count):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i + <span class="number">1</span>, count):</span><br><span class="line">            <span class="keyword">if</span> li[i] &gt; li[j]:</span><br><span class="line">                li[i], li[j] = li[j], li[i]</span><br><span class="line">    <span class="keyword">return</span> li</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    li = [<span class="number">10</span>, <span class="number">8</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">5</span>]</span><br><span class="line">    bubble(li)</span><br><span class="line">    print(li)</span><br></pre></td></tr></table></figure>
-<h2 id="kotlin-代码实现"><a href="#kotlin-代码实现" class="headerlink" title="kotlin 代码实现"></a>kotlin 代码实现</h2><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">bubbleSort</span><span class="params">(array: <span class="type">IntArray</span>)</span></span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//非法检查</span></span><br><span class="line">	<span class="keyword">if</span> (array.isEmpty())</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">val</span> size = array.size</span><br><span class="line">	<span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">0</span> until size - <span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span> (j <span class="keyword">in</span> <span class="number">1</span> until size-i)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (array[j<span class="number">-1</span>]&gt;array[j])</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">val</span> temp=array[j<span class="number">-1</span>]</span><br><span class="line">				array[j<span class="number">-1</span>]=array[j]</span><br><span class="line">				array[j]=temp</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">(args: <span class="type">Array</span>&lt;<span class="type">String</span>&gt;)</span></span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">val</span> sort= intArrayOf(<span class="number">1</span>,<span class="number">0</span>,<span class="number">5</span>,<span class="number">8</span>,<span class="number">6</span>,<span class="number">4</span>,<span class="number">7</span>)</span><br><span class="line">	bubbleSort(sort)</span><br><span class="line">	println(<span class="string">"数字从打到小排序得："</span>)</span><br><span class="line">	sort.forEach &#123;</span><br><span class="line">		print(<span class="string">"<span class="variable">$it</span>"</span>+<span class="string">"\t"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>最后，把这篇文章送给每一位学习冒泡排序的程序员，希望可以帮助他们，也能学后写博文，进行把所学知识梳理成章。由于自己水平有限，或许文章可能会有纰漏，望各位批评指正。</p>
-
-          
+          <p>最近，有位企业的老师给我们上课，课后布置了一个用 Java 实现冒泡排序的作业 ，然而，什么是冒泡排序呢？请看下面：</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/28/different_languages/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1967,12 +1913,24 @@
                 
               
 
-              <time title="创建时间：2018-05-19 21:13:27 / 修改时间：23:26:09" itemprop="dateCreated datePublished" datetime="2018-05-19T21:13:27+08:00">2018-05-19</time>
+              <time title="创建时间：2018-05-19 21:13:27" itemprop="dateCreated datePublished" datetime="2018-05-19T21:13:27+08:00">2018-05-19</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:57:54" itemprop="dateModified" datetime="2019-02-06T00:57:54+08:00">2019-02-06</time>
               
             
           </span>
@@ -2024,14 +1982,14 @@
 
       
         
-          
-            <p>时间匆匆而过，刹那间，发现离考踏入英语四级的考场还有25天左右，平时淡定的我，忽然慌了起来。无论最后的结果如何，剩下的20多天都要埋头苦干，我相信 “ Where there is a will，there is a way. “</p>
-<img src="/2018/05/19/My_Life/img.jpeg">
-<p>虽然这段时间可能很累，学的东西会很多，或者连打电话给家人的时间都没有，体重也往下降了，但是我相信有舍才有得。</p>
-<p>我很感谢一个人，TA一直以来都在我身边陪着我，让我在学习中充满正能力，拥有无止境的动力。但我很惭愧有的时候我辜负他对我的期望，他却没有嫌弃我，在默默的支持我。今天是特别的一天，我想对你说辛苦了，520。</p>
-<p>骚年，加油，趁着还年轻辛苦点也值得。</p>
-
-          
+          <p>时间匆匆而过，刹那间，发现离考踏入英语四级的考场还有25天左右，平时淡定的我，忽然慌了起来。无论最后的结果如何，剩下的20多天都要埋头苦干，我相信 “ Where there is a will，there is a way. “</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/19/My_Life/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -2115,7 +2073,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-count">24</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2142,7 +2100,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -2222,7 +2180,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>

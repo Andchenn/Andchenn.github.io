@@ -346,12 +346,24 @@
                 
               
 
-              <time title="创建时间：2018-05-14 19:54:03 / 修改时间：21:05:35" itemprop="dateCreated datePublished" datetime="2018-05-14T19:54:03+08:00">2018-05-14</time>
+              <time title="创建时间：2018-05-14 19:54:03" itemprop="dateCreated datePublished" datetime="2018-05-14T19:54:03+08:00">2018-05-14</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:56:23" itemprop="dateModified" datetime="2019-02-06T00:56:23+08:00">2019-02-06</time>
               
             
           </span>
@@ -403,18 +415,14 @@
 
       
         
-          
-            <p>作为小白的我，没学过 Django 中的 model 继承，今天学习后，我非常激动。我发现 Django 中的 model 继承和 Python 的类继承十分相似，不过基类要是 django.db.models.Model。</p>
-<p>Django 中有三种继承关系：</p>
-<h4 id="Abstract-base-classes"><a href="#Abstract-base-classes" class="headerlink" title="Abstract base classes"></a>Abstract base classes</h4><img src="/2018/05/14/Inheritance/img1.jpg">
-<p>这是用父 model 来保存那些你不想在子 model 中重复录入的信息。父类是不使用的也就是不生成单独的数据表，这种情况下使用抽象基类继承 Abstract base classes。</p>
-<h4 id="Multi-table-inheritance"><a href="#Multi-table-inheritance" class="headerlink" title="Multi-table inheritance"></a>Multi-table inheritance</h4><img src="/2018/05/14/Inheritance/img2.jpg">
-<p>这是从现有的Model继承并让每个Model都有自己的数据表，那么使用多重表继承。</p>
-<h4 id="Proxy-models"><a href="#Proxy-models" class="headerlink" title="Proxy models"></a>Proxy models</h4><p>楼上采用多重表继承的方式需要为每个类创建一张数据据表，比较消耗资源。为了减少这种不必要的消耗，可以采用代理模型，可以对代理模型进行数据操作，而反应在原始模型上。</p>
-<img src="/2018/05/14/Inheritance/img3.jpg">
-<p>如果你只想在 model 中修改 Python-level 级的行为，而不涉及字段改变。 代理 model 适用于这种场合。而 proxy model 必须继承一个非抽象 model，proxy model 还可以继承一个 proxy model 共享一个非抽象 model。如果没有为 proxy 指定一个 manager 那么其将继承父类的 manager，如果定义了一个 manager，那么这个 manager 称谓 proxy model 的默认 manager。同时父类的 manager 照样能够运行。</p>
-
-          
+          <p>作为小白的我，没学过 Django 中的 model 继承，今天学习后，我非常激动。我发现 Django 中的 model 继承和 Python 的类继承十分相似，不过基类要是 django.db.models.Model。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/14/Inheritance/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -512,12 +520,24 @@
                 
               
 
-              <time title="创建时间：2018-05-13 09:09:04 / 修改时间：11:54:29" itemprop="dateCreated datePublished" datetime="2018-05-13T09:09:04+08:00">2018-05-13</time>
+              <time title="创建时间：2018-05-13 09:09:04" itemprop="dateCreated datePublished" datetime="2018-05-13T09:09:04+08:00">2018-05-13</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:57:36" itemprop="dateModified" datetime="2019-02-06T00:57:36+08:00">2019-02-06</time>
               
             
           </span>
@@ -569,23 +589,15 @@
 
       
         
-          
-            <p>每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。</p>
+          <p>每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。</p>
 <h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p>对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。</p>
-<p>在 Java 中，有一个匿名类的概念，也就是在创建类时，无须指定类的名字，匿名类一般用于方法的参数类型。基本概念是方法参数需要接收一个类或者接口的实例，而这个实例只是在该方法中临时用一下，并没有必要单独定义一个类，或单独创建一个对象变量。因此，就在传入方法参数值的同时创建了类的实例。看！下面的 Java 中匿名类的使用：</p>
-<img src="/2018/05/13/Object_Delegate/img1.jpg">
-<p>在 Kotlin 中，也有类似的功能，但不是匿名类，而是对象。例如，下面的 Kotlin 代码完全实现了前面 Java代码的功能。要建立一个对象，需要使用 object 关键字，该对象要继承的类需要与 object 之间用冒号(:)分隔：如 MyClass(“Tom”)。</p>
-<img src="/2018/05/13/Object_Delegate/img2.jpg">
-<h3 id="委托"><a href="#委托" class="headerlink" title="委托"></a>委托</h3><p>委托其实是一种非常好的代码重用方式，有点类似 AOP (面向方面编程)，也就是将多个地方出现的代码放到同一个地方，以便被多个类属性重用。在学 kotlin 委托时，让我最深刻的就是委托属性和委托类的初始化函数。</p>
-<h4 id="委托属性"><a href="#委托属性" class="headerlink" title="委托属性"></a>委托属性</h4><p>在实际应用中，很多类属性的 getter 和 setter 函数的代码相同或相似，当然，从技术上来说，在每个类中编写相同的代码是可行的，但这样就会造成代码的大量冗余，而且维护困难。为了解决这个问题，Kotlin 允许属性委托，也就是将属性的 getter 和 setter 函数代码放在一个我委托类中，如果在类中声明属性，只需要指定属性类。这样就可以大大减少代码的冗余也让代码更容易维护。</p>
-<h4 id="委托类的初始化函数"><a href="#委托类的初始化函数" class="headerlink" title="委托类的初始化函数"></a>委托类的初始化函数</h4><p>在学习委托类的初始化函数的时候，让我最难理解的就是下面那句代码。</p>
-<img src="/2018/05/13/Object_Delegate/image.png">
-<p>这句代码让我很困惑，特别是 Any 和 Any？，到底这两个有什么区别呢？然后我就去 Google，最后很开心，我找到了，也懂了。</p>
-<p>原来，Kotlin 里的 Any，它相当于 Java 里的 Object，所有其他的类都默认继承了它。而Any 是非空类型层级结构的顶层，Any? 则是可空类型层级结构的顶层。因为 Any? 是 Any 的父类型，所以 Any? 是 Kotlin 类型层级结构的最顶端。例如： String 是 Any 的子类型，则 String? 是 Any? 的子类型。</p>
-<p>而且，kotlin.Any是没有声明超类的类的默认超类。任何不是java.lang.Object，特别是它没有除equals（），hashCode（）和toString（）方法以外的任何成员。</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>对象和委托是 Kotlin 中两个比较大的语法糖，对象相当于 Java 中的匿名对象，而委托的主要作用是实现代码重用，有点类似 AOP (面向方面编程)。</p>
-
-          
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/13/Object_Delegate/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -683,12 +695,24 @@
                 
               
 
-              <time title="创建时间：2018-05-09 13:56:02 / 修改时间：20:30:25" itemprop="dateCreated datePublished" datetime="2018-05-09T13:56:02+08:00">2018-05-09</time>
+              <time title="创建时间：2018-05-09 13:56:02" itemprop="dateCreated datePublished" datetime="2018-05-09T13:56:02+08:00">2018-05-09</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:57:23" itemprop="dateModified" datetime="2019-02-06T00:57:23+08:00">2019-02-06</time>
               
             
           </span>
@@ -740,27 +764,14 @@
 
       
         
-          
-            <p>与 Kotlin 相比，java 是一种冗长的语言。这种冗长的语言使得新程序员很容易理解Java代码。但 Java 代码却有不必要的过度膨胀。而接触过 Kotlin 的人，就会感觉它特简洁。</p>
-<p>在写 Java 代码中，你曾有多少次是重复做同样的事：</p>
-<img src="/2018/05/09/Data_Sealed/img1.jpg">
-<p>当我们编程的时候，如果有100这样的方法，看上去人也会晕，特别是出错的时候，找起来也很浪费时间。</p>
-<p>与此相比，你看看 Kotlin,如下：</p>
-<img src="/2018/05/09/Data_Sealed/img2.jpg">
-<p>看看，Kotlin 中的关键词 data 可以通过数据类根据主构造器的参数自动生成相关的代码。</p>
-<h3 id="数据类"><a href="#数据类" class="headerlink" title="数据类"></a>数据类</h3><p>说起数据类，它有几个注意事项如下：</p>
-<p>主构造器至少有一个参数;</p>
-<p>主构造器的所有参数必须标记为val或var;</p>
-<p>数据类不能是抽象类，open类，封闭（sealed）类的或内部(inner)类的。</p>
-<p>由于数据类要求主构造器必须至少有一个参数，因此子数据中，不可以存在没有参数的主构造器，要想让数据类拥有一个没有参数的构造器。有两种方法如下：</p>
-<p>为主构造器的每个参数都添加默认参数;</p>
-<p>添加一个没有参数的次构造器，并调用主构造器时指定主构造器参数的默认值。</p>
-<h3 id="封闭类"><a href="#封闭类" class="headerlink" title="封闭类"></a>封闭类</h3><p>封闭类也是 Kotlin 的一个语法糖。可以吧它理解为枚举的扩展。一个封装类，前面用 sealed 关键字标识。使用封装类的好处主要是when表达式不需要在使用else形式了。例子如下：</p>
-<img src="/2018/05/09/Data_Sealed/img3.jpg">
-<p>注意：<br>密封类本身是抽象的，它不能被直接实例化，并且可以具有抽象成员。<br>密封类不允许有非私有构造函数（它们的构造函数默认是私有的）。</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>在 Kotlin 中提供了一些特殊类，其中数据类和封装类就是其中的两个。尽管这些类并不是必须的，但在很多时候使用它确实给我们带来很多好处，特别是数据类，当进行数据映射时将会变得得心应手。</p>
-
-          
+          <p>与 Kotlin 相比，java 是一种冗长的语言。这种冗长的语言使得新程序员很容易理解Java代码。但 Java 代码却有不必要的过度膨胀。而接触过 Kotlin 的人，就会感觉它特简洁。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/09/Data_Sealed/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -875,7 +886,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-06-17 09:54:20" itemprop="dateModified" datetime="2018-06-17T09:54:20+08:00">2018-06-17</time>
+                <time title="修改时间：2019-02-06 00:57:08" itemprop="dateModified" datetime="2019-02-06T00:57:08+08:00">2019-02-06</time>
               
             
           </span>
@@ -927,198 +938,14 @@
 
       
         
-          
-            <p>一个月前有一位大神，送了我一本 Kotlin 的书，当时的我，即兴奋又焦虑，原因就不说了，然而，由于各种繁忙，或者说拖延期，直到现在才开始学它，废话少说，直接转入正文。</p>
-<p>这几天，我在学 Kotlin，首先把 Hello World 贴出吧</p>
-<img src="/2018/05/06/Class-Interface/Hello.jpg">
-<p>Kotlin 和 Java 的类有点类似，就是语法糖不一样，但是实际对比一下实现同样功能的 Java 代码，差别还是很大的！</p>
-<p>用 kotlin 类实现一个 Person 类属性的基本用法很简洁，而 Java 类实现Person却很长一串，这就是它们的区别，因此，很多程序员愿意用 Kotlin 开发APP。</p>
-<img src="/2018/05/06/Class-Interface/J-Person.jpg">
-<img src="/2018/05/06/Class-Interface/Kt-Person.jpg">
-<p>要注意的是，Kotlin 分主构造器和第二构造器，主构造器的参数不仅可以用在 init 块中，还可以用于对属性的初始化。而第二构造器前面必须加 constructor 关键字，在类中声明了主构造器所有第二构造器都需要在声明后面调用主构造器。</p>
-<p>特别重要的一点，注意：在主构造器参数中可以使用 var 和 val，但在第二构造器参数中不能使用 var 和 val，这就意味着，第二构造器的参数都是只读的，不能在构造器内部改变参数的值。而 Java 没有这些语法糖。</p>
-<h2 id="修饰符-Modifiers"><a href="#修饰符-Modifiers" class="headerlink" title="修饰符(Modifiers)"></a>修饰符(Modifiers)</h2><p>在Kotlin 中，修饰符有4个：pivate protected internal 和 public。</p>
-<p>pivate:仅仅在类的内部可以访问。</p>
-<p>protected:类似pivate，但在子类中也可以访问。</p>
-<p>internal:任何在模块内部类都可以访问。</p>
-<p>public:任何类都可以访问。</p>
-<h2 id="类的继承"><a href="#类的继承" class="headerlink" title="类的继承(:)"></a>类的继承(:)</h2><p>与Java不同，Kotlin 类的继承需要使用冒号(:),而Java用的是extends。<br>注意，冒号后面需要调用父类的构造器。Kotlin和Java一样，都是单继承的，也就是说，一个Kotlin只能有一个父类。</p>
-<img src="/2018/05/06/Class-Interface/jc.jpg">
-<p>要注意的是，Kotlin默认时class是final的，也就是说，默认时class不允许继承，需要显式地使用open关键词允许继承class。</p>
-<h2 id="接口-Interface"><a href="#接口-Interface" class="headerlink" title="接口(Interface)"></a>接口(Interface)</h2><p>Kotlin 中的接口与Java 中的接口类似，使用interface关键词声明。一个类可以实现多个接口，实现的方法和类继承相同。而且，接口中的属性和方法都是open的。</p>
-<img src="/2018/05/06/Class-Interface/Interface.jpg">
-<p>注意，在Java 中不允许有方法体，不过在Kotlin 中，允许接口的方法包含默认的方法体。</p>
-<h2 id="抽象类-abstact"><a href="#抽象类-abstact" class="headerlink" title="抽象类(abstact)"></a>抽象类(abstact)</h2><p>抽象类和接口非常类似，Kotlin接口支持默认函数体，因此就更像了。学过Java的人都知道，抽象类不能被实类化，需要使用abstact关键字声明，Kotlin也如此。</p>
-<p>注意，抽象方法不需要使用open声明，因此抽象类本身就是可继承的。</p>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>如果从作用上来说，Kotlin 中的类和接口与Java的类和接口没什么本质上的差异，只不过Kotlin 为了体现差异，加了一些语法糖，如接口允许函数带有函数体，支持类属性，不支持静态方法等，这些语法糖的改进是否好不好，仍需要时间的验证，不过Kotlin提供这些功能，不妨我们去尝试用它，是否给我们的开发工作带来便利。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://andchen.com/2018/04/21/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Feng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="程序媛学习之路">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/21/hello-world/" itemprop="url">
-                  Hello World
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-04-21 00:00:00 / 修改时间：15:00:32" itemprop="dateCreated datePublished" datetime="2018-04-21T00:00:00+08:00">2018-04-21</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Hello/" itemprop="url" rel="index"><span itemprop="name">Hello</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-          
+          <p>一个月前有一位大神，送了我一本 Kotlin 的书，当时的我，即兴奋又焦虑，原因就不说了，然而，由于各种繁忙，或者说拖延期，直到现在才开始学它，废话少说，直接转入正文。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/06/Class-Interface/#更多" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -1202,7 +1029,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-count">24</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1229,7 +1056,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -1309,7 +1136,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>

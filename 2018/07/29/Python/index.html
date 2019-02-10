@@ -102,20 +102,20 @@
 
 
 
-  <meta name="description" content="大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。 什么是Cookie?在实际情况中，很多网站的内容都是需要登录之后才能看到，如此我们就需要进行模拟登录，使用登录后的状态进行爬取。这里就需要使用到Cookie。 现在大多数的网站都是使用Cookie跟踪用户的登录状态，一旦网站验证了登录信息，就会将登录信息保存在浏览器的cookie中。网站会把这个cookie作为验证的凭据，在浏览网站">
+  <meta name="description" content="大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。">
 <meta name="keywords" content="Python">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python爬虫--Cookie介绍和模拟登录(10)">
 <meta property="og:url" content="https://andchen.com/2018/07/29/Python/index.html">
 <meta property="og:site_name" content="程序媛学习之路">
-<meta property="og:description" content="大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。 什么是Cookie?在实际情况中，很多网站的内容都是需要登录之后才能看到，如此我们就需要进行模拟登录，使用登录后的状态进行爬取。这里就需要使用到Cookie。 现在大多数的网站都是使用Cookie跟踪用户的登录状态，一旦网站验证了登录信息，就会将登录信息保存在浏览器的cookie中。网站会把这个cookie作为验证的凭据，在浏览网站">
+<meta property="og:description" content="大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://andchen.com/2018/07/29/Python/img1.jpg">
 <meta property="og:image" content="https://andchen.com/2018/07/29/Python/img2.jpg">
-<meta property="og:updated_time" content="2018-07-28T18:04:29.731Z">
+<meta property="og:updated_time" content="2019-02-05T17:01:18.373Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python爬虫--Cookie介绍和模拟登录(10)">
-<meta name="twitter:description" content="大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。 什么是Cookie?在实际情况中，很多网站的内容都是需要登录之后才能看到，如此我们就需要进行模拟登录，使用登录后的状态进行爬取。这里就需要使用到Cookie。 现在大多数的网站都是使用Cookie跟踪用户的登录状态，一旦网站验证了登录信息，就会将登录信息保存在浏览器的cookie中。网站会把这个cookie作为验证的凭据，在浏览网站">
+<meta name="twitter:description" content="大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。">
 <meta name="twitter:image" content="https://andchen.com/2018/07/29/Python/img1.jpg">
 
 
@@ -349,12 +349,24 @@
                 
               
 
-              <time title="创建时间：2018-07-29 00:42:50 / 修改时间：02:04:29" itemprop="dateCreated datePublished" datetime="2018-07-29T00:42:50+08:00">2018-07-29</time>
+              <time title="创建时间：2018-07-29 00:42:50" itemprop="dateCreated datePublished" datetime="2018-07-29T00:42:50+08:00">2018-07-29</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 01:01:18" itemprop="dateModified" datetime="2019-02-06T01:01:18+08:00">2019-02-06</time>
               
             
           </span>
@@ -406,6 +418,7 @@
 
       
         <p>大家好，这篇文章我们来看一下Cookie是什么，和他的一些用法。</p>
+<a id="more"></a>
 <h2 id="什么是Cookie"><a href="#什么是Cookie" class="headerlink" title="什么是Cookie?"></a>什么是Cookie?</h2><p>在实际情况中，很多网站的内容都是需要登录之后才能看到，如此我们就需要进行模拟登录，使用登录后的状态进行爬取。这里就需要使用到Cookie。</p>
 <p>现在大多数的网站都是使用Cookie跟踪用户的登录状态，一旦网站验证了登录信息，就会将登录信息保存在浏览器的cookie中。网站会把这个cookie作为验证的凭据，在浏览网站的页面是返回给服务器。<br>因为cookie是保存在本地的，自然cookie就可以进行篡改和伪造，暂且不表，我们先来看看Cookie长什么样子。</p>
 <p>我们以豆瓣为例。打开Chrome的开发者工具(F12)，点开Network，打开一个链接，在headers里面：</p>
@@ -554,7 +567,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-count">24</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -581,7 +594,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -677,7 +690,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>

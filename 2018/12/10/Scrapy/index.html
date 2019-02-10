@@ -102,18 +102,18 @@
 
 
 
-  <meta name="description" content="今天，遇到在 scrapy 中创建项目以后，在settings 文件中有这样的一条默认开启的语句： 1ROBOTSTXT_OBEY = True 观察代码发现，默认为 True，就是要遵守 robots.txt 的规则，那么 robots.txt 是个什么东西呢？ 通俗来说，robot.txt 是遵循 Robot 协议的一个文件，它保存在网站的服务器中，它的作用是，告诉搜索引擎爬虫，本网站哪些目录">
+  <meta name="description" content="今天，遇到在 scrapy 中创建项目以后，在settings 文件中有这样的一条默认开启的语句： 1ROBOTSTXT_OBEY = True">
 <meta name="keywords" content="Scrapy">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Scrapy 中 ROBOTSTXT_OBEY = True 的相关说明">
 <meta property="og:url" content="https://andchen.com/2018/12/10/Scrapy/index.html">
 <meta property="og:site_name" content="程序媛学习之路">
-<meta property="og:description" content="今天，遇到在 scrapy 中创建项目以后，在settings 文件中有这样的一条默认开启的语句： 1ROBOTSTXT_OBEY = True 观察代码发现，默认为 True，就是要遵守 robots.txt 的规则，那么 robots.txt 是个什么东西呢？ 通俗来说，robot.txt 是遵循 Robot 协议的一个文件，它保存在网站的服务器中，它的作用是，告诉搜索引擎爬虫，本网站哪些目录">
+<meta property="og:description" content="今天，遇到在 scrapy 中创建项目以后，在settings 文件中有这样的一条默认开启的语句： 1ROBOTSTXT_OBEY = True">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-12-10T12:34:19.268Z">
+<meta property="og:updated_time" content="2019-02-10T05:40:31.758Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Scrapy 中 ROBOTSTXT_OBEY = True 的相关说明">
-<meta name="twitter:description" content="今天，遇到在 scrapy 中创建项目以后，在settings 文件中有这样的一条默认开启的语句： 1ROBOTSTXT_OBEY = True 观察代码发现，默认为 True，就是要遵守 robots.txt 的规则，那么 robots.txt 是个什么东西呢？ 通俗来说，robot.txt 是遵循 Robot 协议的一个文件，它保存在网站的服务器中，它的作用是，告诉搜索引擎爬虫，本网站哪些目录">
+<meta name="twitter:description" content="今天，遇到在 scrapy 中创建项目以后，在settings 文件中有这样的一条默认开启的语句： 1ROBOTSTXT_OBEY = True">
 
 
 
@@ -346,12 +346,24 @@
                 
               
 
-              <time title="创建时间：2018-12-10 20:06:07 / 修改时间：20:34:19" itemprop="dateCreated datePublished" datetime="2018-12-10T20:06:07+08:00">2018-12-10</time>
+              <time title="创建时间：2018-12-10 20:06:07" itemprop="dateCreated datePublished" datetime="2018-12-10T20:06:07+08:00">2018-12-10</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-10 13:40:31" itemprop="dateModified" datetime="2019-02-10T13:40:31+08:00">2019-02-10</time>
               
             
           </span>
@@ -368,7 +380,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/undefined/" itemprop="url" rel="index"><span itemprop="name">undefined</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Scrapy/" itemprop="url" rel="index"><span itemprop="name">Scrapy</span></a></span>
 
                 
                 
@@ -404,6 +416,7 @@
       
         <p>今天，遇到在 scrapy 中创建项目以后，在settings 文件中有这样的一条默认开启的语句：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROBOTSTXT_OBEY = <span class="keyword">True</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>观察代码发现，默认为 True，就是要遵守 robots.txt 的规则，那么 robots.txt 是个什么东西呢？</p>
 <p>通俗来说，robot.txt 是遵循 Robot 协议的一个文件，它保存在网站的服务器中，它的作用是，告诉搜索引擎爬虫，本网站哪些目录下的网页不希望你进行爬取收录。在 Scrapy 启动后，会在第一时间访问网站的 robot.txt 文件，然后决定该网站的爬取范围。当然，我们并不是在做搜索引擎，而且在某些情况下我们想要获取的内容恰恰是被 robots.txt 所禁止访问的。所以，某些时候，我们就要将此配置项设置为 False，拒绝遵守 Robot 协议！</p>
 
@@ -512,7 +525,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-count">24</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -539,7 +552,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -619,7 +632,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>

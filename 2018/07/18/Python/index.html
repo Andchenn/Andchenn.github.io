@@ -102,18 +102,18 @@
 
 
 
-  <meta name="description" content="相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。 什么是BeautifulSoup？Python的网页解析可以用正则表达式去完成，那么我们在写的时候，要挨个的去把代码拿出来匹配，而且还要写匹配的规则，整">
+  <meta name="description" content="相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。">
 <meta name="keywords" content="Python">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python爬虫--使用Beautiful Soup(4)">
 <meta property="og:url" content="https://andchen.com/2018/07/18/Python/index.html">
 <meta property="og:site_name" content="程序媛学习之路">
-<meta property="og:description" content="相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。 什么是BeautifulSoup？Python的网页解析可以用正则表达式去完成，那么我们在写的时候，要挨个的去把代码拿出来匹配，而且还要写匹配的规则，整">
+<meta property="og:description" content="相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-07-18T08:10:24.941Z">
+<meta property="og:updated_time" content="2019-02-05T16:59:53.697Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python爬虫--使用Beautiful Soup(4)">
-<meta name="twitter:description" content="相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。 什么是BeautifulSoup？Python的网页解析可以用正则表达式去完成，那么我们在写的时候，要挨个的去把代码拿出来匹配，而且还要写匹配的规则，整">
+<meta name="twitter:description" content="相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。">
 
 
 
@@ -346,12 +346,24 @@
                 
               
 
-              <time title="创建时间：2018-07-18 14:55:37 / 修改时间：16:10:24" itemprop="dateCreated datePublished" datetime="2018-07-18T14:55:37+08:00">2018-07-18</time>
+              <time title="创建时间：2018-07-18 14:55:37" itemprop="dateCreated datePublished" datetime="2018-07-18T14:55:37+08:00">2018-07-18</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:59:53" itemprop="dateModified" datetime="2019-02-06T00:59:53+08:00">2019-02-06</time>
               
             
           </span>
@@ -403,6 +415,7 @@
 
       
         <p>相信大家对 Requests 库的用法已经很熟练了，今天我讲一个强大的解析工具Beautiful Soup，它借助网页的结构和属性等特性来解析网页。有了它，我们不用再去写一些复杂的正则表达式，只需要简单的几条语句，就可以完成网页中某个元素的提取。</p>
+<a id="more"></a>
 <h2 id="什么是BeautifulSoup？"><a href="#什么是BeautifulSoup？" class="headerlink" title="什么是BeautifulSoup？"></a>什么是BeautifulSoup？</h2><p>Python的网页解析可以用正则表达式去完成，那么我们在写的时候，要挨个的去把代码拿出来匹配，而且还要写匹配的规则，整体实现起来就很复杂。BeautifulSoup呢，它是一个方便的网页解析库，处理高效，支持多种解析器。大部分情况下，利用它我们不在需要编写正则表达式就可以方便的实现网页信息的提取。</p>
 <p>BeautifulSoup是一个网页解析库，它支持很多解析器，不过最主流的有两个。一个是Python标准库，一个是lxml HTML 解析器。两者的使用方法相似：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"></span><br><span class="line"><span class="comment"># Python的标准库</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'html.parser'</span>)</span><br><span class="line"><span class="comment"># lxml</span></span><br><span class="line">BeautifulSoup(html, <span class="string">'lxml'</span>)</span><br></pre></td></tr></table></figure>
@@ -563,7 +576,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-count">24</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -590,7 +603,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -686,7 +699,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>

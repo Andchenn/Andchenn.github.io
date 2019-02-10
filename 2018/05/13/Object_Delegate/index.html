@@ -102,21 +102,21 @@
 
 
 
-  <meta name="description" content="每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。 对象对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。 在 Java 中，有一个匿名类的概念，也就是在创建类时，无须指定类的名字，匿名类一般用于方法的参数类型。基本概念是方法参数需要接收一个类或者接口的实例，而这个实例">
+  <meta name="description" content="每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。 对象对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。">
 <meta name="keywords" content="kotlin">
 <meta property="og:type" content="article">
 <meta property="og:title" content="对象和委托">
 <meta property="og:url" content="https://andchen.com/2018/05/13/Object_Delegate/index.html">
 <meta property="og:site_name" content="程序媛学习之路">
-<meta property="og:description" content="每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。 对象对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。 在 Java 中，有一个匿名类的概念，也就是在创建类时，无须指定类的名字，匿名类一般用于方法的参数类型。基本概念是方法参数需要接收一个类或者接口的实例，而这个实例">
+<meta property="og:description" content="每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。 对象对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://andchen.com/2018/05/13/Object_Delegate/img1.jpg">
 <meta property="og:image" content="https://andchen.com/2018/05/13/Object_Delegate/img2.jpg">
 <meta property="og:image" content="https://andchen.com/2018/05/13/Object_Delegate/image.png">
-<meta property="og:updated_time" content="2018-05-13T03:54:29.679Z">
+<meta property="og:updated_time" content="2019-02-05T16:57:36.406Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="对象和委托">
-<meta name="twitter:description" content="每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。 对象对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。 在 Java 中，有一个匿名类的概念，也就是在创建类时，无须指定类的名字，匿名类一般用于方法的参数类型。基本概念是方法参数需要接收一个类或者接口的实例，而这个实例">
+<meta name="twitter:description" content="每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。 对象对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。">
 <meta name="twitter:image" content="https://andchen.com/2018/05/13/Object_Delegate/img1.jpg">
 
 
@@ -350,12 +350,24 @@
                 
               
 
-              <time title="创建时间：2018-05-13 09:09:04 / 修改时间：11:54:29" itemprop="dateCreated datePublished" datetime="2018-05-13T09:09:04+08:00">2018-05-13</time>
+              <time title="创建时间：2018-05-13 09:09:04" itemprop="dateCreated datePublished" datetime="2018-05-13T09:09:04+08:00">2018-05-13</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-06 00:57:36" itemprop="dateModified" datetime="2019-02-06T00:57:36+08:00">2019-02-06</time>
               
             
           </span>
@@ -408,6 +420,7 @@
       
         <p>每当学习 Kotlin 的时候，我总想到 Java，它们之间的不同之处。</p>
 <h3 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h3><p>对象是 Kotlin 中的一个重要概念，可能很多读者会有疑问：什么是对象？对象是实例化类后的东西？为什么要提供对象呢？要回答这些问题，还要从 Java 说起。</p>
+<a id="more"></a>
 <p>在 Java 中，有一个匿名类的概念，也就是在创建类时，无须指定类的名字，匿名类一般用于方法的参数类型。基本概念是方法参数需要接收一个类或者接口的实例，而这个实例只是在该方法中临时用一下，并没有必要单独定义一个类，或单独创建一个对象变量。因此，就在传入方法参数值的同时创建了类的实例。看！下面的 Java 中匿名类的使用：</p>
 <img src="/2018/05/13/Object_Delegate/img1.jpg">
 <p>在 Kotlin 中，也有类似的功能，但不是匿名类，而是对象。例如，下面的 Kotlin 代码完全实现了前面 Java代码的功能。要建立一个对象，需要使用 object 关键字，该对象要继承的类需要与 object 之间用冒号(:)分隔：如 MyClass(“Tom”)。</p>
@@ -539,7 +552,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">25</span>
+                    <span class="site-state-item-count">24</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -566,7 +579,7 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -662,7 +675,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love" id="animate">
     <i class="fa fa-user"></i>
   </span>
